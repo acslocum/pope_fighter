@@ -36,21 +36,23 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 
 # Initialize Game Window
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.NOFRAME)
-pygame.display.set_caption("Street Fighter")
+game_title = 'PAPAL KOMBAT'
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+pygame.display.set_caption(game_title)
 clock = pygame.time.Clock()
 
 # Load Assets
-bg_image = cv2.imread(resource_path("assets/images/bg1.jpg"))
+bg_image = cv2.imread(resource_path("assets/images/bg2.jpg"))
 victory_img = pygame.image.load(resource_path("assets/images/victory.png")).convert_alpha()
 warrior_victory_img = pygame.image.load(resource_path("assets/images/warrior.png")).convert_alpha()
 wizard_victory_img = pygame.image.load(resource_path("assets/images/wizard.png")).convert_alpha()
 
 # Fonts
-menu_font = pygame.font.Font(resource_path("assets/fonts/turok.ttf"), 50)
-menu_font_title = pygame.font.Font(resource_path("assets/fonts/turok.ttf"), 100)  # Larger font for title
-count_font = pygame.font.Font(resource_path("assets/fonts/turok.ttf"), 80)
-score_font = pygame.font.Font(resource_path("assets/fonts/turok.ttf"), 30)
+font_name = 'assets/fonts/Papyrus.ttc'
+menu_font = pygame.font.Font(resource_path(font_name), 50)
+menu_font_title = pygame.font.Font(resource_path(font_name), 100)  # Larger font for title
+count_font = pygame.font.Font(resource_path(font_name), 80)
+score_font = pygame.font.Font(resource_path(font_name), 30)
 
 # Music and Sounds
 pygame.mixer.music.load(resource_path("assets/audio/music.mp3"))
@@ -71,12 +73,14 @@ WIZARD_ANIMATION_STEPS = [8, 8, 1, 8, 8, 3, 7]
 
 # Fighter Data
 WARRIOR_SIZE = 162
-WARRIOR_SCALE = 4
+#WARRIOR_SCALE = 4
+WARRIOR_SCALE = 8
 WARRIOR_OFFSET = [72, 46]
+WARRIOR_OFFSET = [50, 80]
 WARRIOR_DATA = [WARRIOR_SIZE, WARRIOR_SCALE, WARRIOR_OFFSET]
 WIZARD_SIZE = 250
-WIZARD_SCALE = 3
-WIZARD_OFFSET = [112, 97]
+WIZARD_SCALE = 6
+WIZARD_OFFSET = [50, 140]
 WIZARD_DATA = [WIZARD_SIZE, WIZARD_SCALE, WIZARD_OFFSET]
 
 # Game Variables
@@ -152,9 +156,9 @@ def main_menu():
 
         elapsed_time = (pygame.time.get_ticks() - animation_start_time) / 1000
         scale_factor = 1 + 0.05 * math.sin(elapsed_time * 2 * math.pi)  # Slight scaling
-        scaled_font = pygame.font.Font("assets/fonts/turok.ttf", int(100 * scale_factor))
+        scaled_font = pygame.font.Font(font_name, int(100 * scale_factor))
 
-        title_text = "STREET FIGHTER"
+        title_text = game_title
         colors = [BLUE, GREEN, YELLOW]
         shadow_color = BLACK
         title_x = SCREEN_WIDTH // 2 - scaled_font.size(title_text)[0] // 2
@@ -203,7 +207,7 @@ def scores_screen():
         scores_title = "SCORES"
         draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
 
-        score_font_large = pygame.font.Font("assets/fonts/turok.ttf", 60)  # Increased size for scores
+        score_font_large = pygame.font.Font(font_name, 60)  # Increased size for scores
         p1_text = f"P1: {score[0]}"
         p2_text = f"P2: {score[1]}"
         shadow_offset = 5
@@ -241,12 +245,12 @@ def reset_game():
 def draw_health_bar(health, x, y):
     pygame.draw.rect(screen, BLACK, (x, y, 200, 20))
     if health > 0:
-        pygame.draw.rect(screen, RED, (x, y, health * 2, 20))
+        pygame.draw.rect(screen, WHITE, (x, y, health * 2, 20))
     pygame.draw.rect(screen, WHITE, (x, y, 200, 20), 2)
 
 
 def countdown():
-    countdown_font = pygame.font.Font("assets/fonts/turok.ttf", 100)
+    countdown_font = pygame.font.Font(font_name, 100)
     countdown_texts = ["3", "2", "1", "FIGHT!"]
 
     for text in countdown_texts:
@@ -274,8 +278,8 @@ def game_loop():
     while True:
         draw_bg(bg_image, is_game_started=game_started)
 
-        draw_text(f"P1: {score[0]}", score_font, RED, 20, 20)
-        draw_text(f"P2: {score[1]}", score_font, RED, SCREEN_WIDTH - 220, 20)
+        draw_text(f"P1: {score[0]}", score_font, WHITE, 20, 20)
+        draw_text(f"P2: {score[1]}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
         draw_health_bar(fighter_1.health, 20, 50)
         draw_health_bar(fighter_2.health, SCREEN_WIDTH - 220, 50)
 
