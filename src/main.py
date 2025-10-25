@@ -7,6 +7,7 @@ import numpy as np
 import os
 import sys
 from fighter import Fighter
+import db_parser
 
 # Helper Function for Bundled Assets
 def resource_path(relative_path):
@@ -65,6 +66,11 @@ sword_fx = pygame.mixer.Sound(resource_path("assets/audio/sword.wav"))
 sword_fx.set_volume(0.5)
 magic_fx = pygame.mixer.Sound(resource_path("assets/audio/magic.wav"))
 magic_fx.set_volume(0.75)
+
+# declare pope IDs
+left_pope : db_parser.PopeData = None
+right_pope: db_parser.PopeData = None
+popeDB = db_parser.getPopes('assets/db/Pope-mon_stats.xlsx')
 
 # Load Fighter Spritesheets
 warrior_sheet = pygame.image.load(resource_path("assets/images/warrior.png")).convert_alpha()
@@ -153,6 +159,12 @@ def draw_gradient_text(text, font, x, y, colors):
 
 def main_menu():
     animation_start_time = pygame.time.get_ticks()
+    prefix = 'A'
+    suffix = 'Z'
+    scanned = ''
+    requiredScanLength = 3 + len(prefix) + len(suffix) # required length of keys to grab from a scan
+    global left_pope
+    global right_pope
 
     while True:
         draw_bg(bg_image, is_game_started=False)
@@ -198,6 +210,32 @@ def main_menu():
                 if exit_button.collidepoint(event.pos):
                     pygame.quit()
                     exit()
+            elif event.type == pygame.KEYDOWN:
+                #print(len(pygame.key.name(event.key)))
+                scanned += event.unicode.upper()
+                print(scanned)
+                if len(scanned) == requiredScanLength:
+                    if scanned.startswith(prefix) and scanned.endswith(suffix):
+                        id = int(scanned[1:4])
+                        if id in popeDB:
+                            pope = popeDB[id]
+                            print(f'Scanned in pope ID: {id}, {pope.name}')
+                            if left_pope is None:
+                                left_pope = pope
+                            elif right_pope is None:
+                                right_pope = pope
+
+                            # check to see if we have two popes
+                            if left_pope and right_pope:
+                                print(f'We\'ve got a match {left_pope.name} vs. {right_pope.name}')
+                                #return "START"
+                        else:
+                            print(f'Scanned in unknown pope ID: {id}')
+                    else:
+                        print(f'Illegal scan: {scanned}')
+
+                    # reset for next scan
+                    scanned = ''
 
         pygame.display.update()
         clock.tick(FPS)
