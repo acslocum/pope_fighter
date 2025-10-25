@@ -27,7 +27,7 @@ class Fighter:
 
     def load_images(self, directory):
         # parse description file and then load sprites from their spritesheets
-        print(f'Loading sprites from {directory}')
+        # print(f'Loading sprites from {directory}')
         desc_filename = 'descriptions.txt' # there should be one of these at the top of each character dir
         sheet_filename = 'spritesheet.png' # should be called this for all actions
 
