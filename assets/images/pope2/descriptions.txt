@@ -1,0 +1,7 @@
+# filename, num columns, num rows, num images
+attack,4,6,21
+attack2,4,8,29
+death,4,8,29
+idle,4,8,29
+victory,4,8,29
+walking,4,7,28
