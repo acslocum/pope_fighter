@@ -1,15 +1,17 @@
 import pygame
+import os
+from sprite_loader import *
 class Fighter:
-    def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps, sound):
+    def __init__(self, player, x, y, flip, directory, sound):
         self.player = player
-        self.size = data[0]
-        self.image_scale = data[1]
-        self.offset = data[2]
         self.flip = flip
-        self.animation_list = self.load_images(sprite_sheet, animation_steps)
+        self.animation_list = self.load_images(directory)
+        self.image_scale = 8
+        self.offset = (0,0)
         self.action = 0  # 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
+        self.size = self.image.get_height() # probably should change to actual size, or fix spritesheets so sprites are square
         self.update_time = pygame.time.get_ticks()
         self.rect = pygame.Rect((x, y, 80, 180))
         self.vel_y = 0
@@ -23,17 +25,30 @@ class Fighter:
         self.health = 100
         self.alive = True
 
-    def load_images(self, sprite_sheet, animation_steps):
-        # extract images from spritesheet
-        animation_list = []
-        for y, animation in enumerate(animation_steps):
-            temp_img_list = []
-            for x in range(animation):
-                temp_img = sprite_sheet.subsurface(x * self.size, y * self.size, self.size, self.size)
-                temp_img_list.append(
-                    pygame.transform.scale(temp_img, (self.size * self.image_scale, self.size * self.image_scale)))
-            animation_list.append(temp_img_list)
-        return animation_list
+    def load_images(self, directory):
+        # parse description file and then load sprites from their spritesheets
+        print(f'Loading sprites from {directory}')
+        desc_filename = 'descriptions.txt' # there should be one of these at the top of each character dir
+        sheet_filename = 'spritesheet.png' # should be called this for all actions
+
+        desc_file = os.path.join(directory, desc_filename)
+        descriptions = parseDescriptionFile(desc_file)
+        #print(descriptions)
+
+        sprites = []
+        for action in descriptions:
+            action_dir = os.path.join(directory, action)
+            sprite_file = os.path.join(action_dir, sheet_filename)
+
+            sprite_layout = (descriptions[action]['columns'], descriptions[action]['rows']) # columns, rows - might not be complete
+            num_sprites = descriptions[action]['count']
+
+            spritesheet = pygame.image.load(sprite_file).convert_alpha()
+            action_sprites = get_sequence(spritesheet, sprite_layout, num_sprites)
+
+            sprites.append(action_sprites)
+
+        return sprites
 
     def move(self, screen_width, screen_height, target, round_over):
         SPEED = 10

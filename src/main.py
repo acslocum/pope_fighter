@@ -24,6 +24,8 @@ pygame.init()
 info = pygame.display.Info()
 SCREEN_WIDTH = info.current_w
 SCREEN_HEIGHT = info.current_h
+SCREEN_WIDTH = 1778
+SCREEN_HEIGHT = 1000
 FPS = 60
 ROUND_OVER_COOLDOWN = 3000
 
@@ -37,7 +39,8 @@ GREEN = (0, 255, 0)
 
 # Initialize Game Window
 game_title = 'PAPAL KOMBAT'
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+#screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(game_title)
 clock = pygame.time.Clock()
 
@@ -67,7 +70,7 @@ magic_fx.set_volume(0.75)
 warrior_sheet = pygame.image.load(resource_path("assets/images/warrior.png")).convert_alpha()
 wizard_sheet = pygame.image.load(resource_path("assets/images/wizard.png")).convert_alpha()
 
-# Define Animation Steps
+# Define Animation Steps: # 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
 WARRIOR_ANIMATION_STEPS = [10, 8, 1, 7, 7, 3, 7]
 WIZARD_ANIMATION_STEPS = [8, 8, 1, 8, 8, 3, 7]
 
@@ -238,9 +241,10 @@ def scores_screen():
 
 def reset_game():
     global fighter_1, fighter_2
-    fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
-    fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
-
+    # fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
+    # fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
+    fighter_1 = Fighter(1, 200, 310, False, 'assets/images/pope1', sword_fx)
+    fighter_2 = Fighter(2, 700, 310, True, 'assets/images/pope2', magic_fx)
 
 def draw_health_bar(health, x, y):
     pygame.draw.rect(screen, BLACK, (x, y, 200, 20))
