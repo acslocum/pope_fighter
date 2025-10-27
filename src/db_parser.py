@@ -1,4 +1,6 @@
+import os
 import pandas as pd
+import pygame
 
 class PopeData:
     def __init__(self):
@@ -14,7 +16,8 @@ class PopeData:
         self.miracles : int = 0
         self.wisdom : int = 0
         self.legacy : int = 0
-        self.image : str = ''
+        self.image_file : str = ''
+        self.image = None
         self.length_of_reign : float = 0.0
 
     def __str__(self):
@@ -33,17 +36,24 @@ class PopeData:
         self.miracles = int(row['Miracles'])
         self.wisdom = int(row['Wisdom'])
         self.legacy = int(row['Legacy'])
-        self.image = str(row['Image'])
+        self.image_file = str(row['Image'])
         self.length_of_reign = float(row['Length_of_Reign'])
 
 def getPopes(filename) -> dict[int, PopeData]:
+    directory = os.path.dirname(filename)
+    print(f'Pope database directory: {directory}')
     df = pd.read_excel(filename, sheet_name=0)
     # print(df.head())
+    print(pygame.get_init())
 
     popes : dict[int, PopeData] = {}
     for index, row in df.iterrows():
         p = PopeData()
         p.parseFromPandasRow(row)
+        img_filename = os.path.join(directory, f'{p.id:03d}.png')
+        if pygame.get_init() and os.path.exists(img_filename):
+            p.image = pygame.image.load(img_filename)
+            print(f'Loaded {img_filename}')
         popes[p.id] = p
 
     return popes

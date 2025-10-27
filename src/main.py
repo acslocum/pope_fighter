@@ -39,7 +39,7 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 
 # Initialize Game Window
-game_title = 'PAPAL KOMBAT'
+game_title = 'POPÉMON: ACENSIO'
 #screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(game_title)
@@ -100,6 +100,9 @@ def draw_text(text, font, color, x, y):
     img = font.render(text, True, color)
     screen.blit(img, (x, y))
 
+def gen_text_img(text, font, color):
+    img = font.render(text, True, color)
+    return img
 
 def blur_bg(image):
     image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -127,6 +130,34 @@ def draw_button(text, font, text_col, button_col, x, y, width, height):
     screen.blit(text_img, text_rect)
     return pygame.Rect(x, y, width, height)
 
+def aspect_scale(img, tgtSize):
+    #Scales 'img' to fit into box bx/by.
+    # This method will retain the original image's aspect ratio """
+    bx = tgtSize[0]
+    by = tgtSize[1]
+    ix,iy = img.get_size()
+    if ix > iy:
+        # fit to width
+        scale_factor = bx/float(ix)
+        sy = scale_factor * iy
+        if sy > by:
+            scale_factor = by/float(iy)
+            sx = scale_factor * ix
+            sy = by
+        else:
+            sx = bx
+    else:
+        # fit to height
+        scale_factor = by/float(iy)
+        sx = scale_factor * ix
+        if sx > bx:
+            scale_factor = bx/float(ix)
+            sx = bx
+            sy = scale_factor * iy
+        else:
+            sy = by
+
+    return pygame.transform.scale(img, (sx,sy))
 
 def victory_screen(winner_img):
     start_time = pygame.time.get_ticks()
@@ -165,9 +196,31 @@ def main_menu():
     requiredScanLength = 3 + len(prefix) + len(suffix) # required length of keys to grab from a scan
     global left_pope
     global right_pope
+    frame_file = 'assets/images/frame.png'
+    frame_offset = 98 # number of pixels in x & y in original scale that image portions starts
+    frame_height_percent = 0.6 # % of screen height frame's height should occupy
+    try:
+        frame_img = pygame.image.load(frame_file).convert_alpha()
+        scale_factor = SCREEN_HEIGHT * frame_height_percent / frame_img.get_height()
+        scaled_size = (frame_img.get_width() * scale_factor, frame_img.get_height() * scale_factor)
+        frame_img = pygame.transform.smoothscale(frame_img, scaled_size)
+        frame_offset = frame_offset * scale_factor
+        img_size = (scaled_size[0] - 2 * frame_offset, scaled_size[1] - 2 * frame_offset)
+
+    except pygame.error as e:
+        print(f"Error loading image: {e}")
+        frame_img = None
 
     while True:
         draw_bg(bg_image, is_game_started=False)
+        if frame_img is not None:
+            f1_x = SCREEN_WIDTH * 0.1
+            f1_y = SCREEN_HEIGHT * 0.2
+            f2_x = SCREEN_WIDTH * 0.9 - frame_img.get_width()
+            screen.blit(frame_img, (f1_x, f1_y))
+            screen.blit(frame_img, (f2_x, f1_y))
+            pygame.draw.rect(screen, WHITE, (f1_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
+            pygame.draw.rect(screen, WHITE, (f2_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
 
         elapsed_time = (pygame.time.get_ticks() - animation_start_time) / 1000
         scale_factor = 1 + 0.05 * math.sin(elapsed_time * 2 * math.pi)  # Slight scaling
@@ -177,7 +230,7 @@ def main_menu():
         colors = [BLUE, GREEN, YELLOW]
         shadow_color = BLACK
         title_x = SCREEN_WIDTH // 2 - scaled_font.size(title_text)[0] // 2
-        title_y = SCREEN_HEIGHT // 6
+        title_y = SCREEN_HEIGHT * 0.05
 
         shadow_offset = 5
         draw_text(title_text, scaled_font, shadow_color, title_x + shadow_offset, title_y + shadow_offset)
@@ -187,29 +240,55 @@ def main_menu():
         button_height = 60
         button_spacing = 30
 
-        start_button_y = SCREEN_HEIGHT // 2 - (button_height + button_spacing) * 1.5 + 50
-        scores_button_y = SCREEN_HEIGHT // 2 - (button_height + button_spacing) * 0.5 + 50
-        exit_button_y = SCREEN_HEIGHT // 2 + (button_height + button_spacing) * 0.5 + 50
+        if left_pope is not None and right_pope is None:
+            clear_button_x = SCREEN_WIDTH * 0.1 + (frame_img.get_width() - button_width) // 2
+            clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
+            clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
+        elif right_pope is not None:
+            clear_button_x = SCREEN_WIDTH * 0.9 - frame_img.get_width() + (frame_img.get_width() - button_width) // 2
+            clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
+            clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
+        else:
+            # need to scan first pope
+            txt_img = gen_text_img('Scan Pope 1', menu_font, BLACK)
+            txt_x = f1_x + (frame_img.get_width() - txt_img.get_width()) / 2
+            txt_y = f1_y + (frame_img.get_height() - txt_img.get_height()) / 2
+            screen.blit(txt_img, (txt_x, txt_y))
 
-        start_button = draw_button("START GAME", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                   start_button_y, button_width, button_height)
-        scores_button = draw_button("SCORES", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                    scores_button_y, button_width, button_height)
-        exit_button = draw_button("EXIT", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                  exit_button_y, button_width, button_height)
+        if left_pope is not None and left_pope.image is not None:
+            scaled_img = aspect_scale(left_pope.image, img_size)
+            sx = f1_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+            sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
+            screen.blit(scaled_img, (sx,sy))
+        if right_pope is not None and right_pope.image is not None:
+            scaled_img = aspect_scale(right_pope.image, img_size)
+            sx = f2_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+            sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
+            screen.blit(scaled_img, (sx,sy))
+            
+        #scores_button_y = SCREEN_HEIGHT // 2 - (button_height + button_spacing) * 0.5 + 50
+        #exit_button_y = SCREEN_HEIGHT // 2 + (button_height + button_spacing) * 0.5 + 50
+
+        # start_button = draw_button("START GAME", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+        #                            start_button_y, button_width, button_height)
+        # scores_button = draw_button("SCORES", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+        #                             scores_button_y, button_width, button_height)
+        # exit_button = draw_button("EXIT", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+        #                           exit_button_y, button_width, button_height)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if start_button.collidepoint(event.pos):
-                    return "START"
-                if scores_button.collidepoint(event.pos):
-                    return "SCORES"
-                if exit_button.collidepoint(event.pos):
-                    pygame.quit()
-                    exit()
+                # if start_button.collidepoint(event.pos):
+                #     return "START"
+                # if scores_button.collidepoint(event.pos):
+                #     return "SCORES"
+                # if exit_button.collidepoint(event.pos):
+                #     pygame.quit()
+                #     exit()
+                pass
             elif event.type == pygame.KEYDOWN:
                 #print(len(pygame.key.name(event.key)))
                 scanned += event.unicode.upper()
