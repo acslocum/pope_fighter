@@ -25,6 +25,13 @@ class Fighter:
         self.health = 100
         self.alive = True
 
+        # pope specifc mods
+        self.holiness = 6
+        self.miracles = 6
+        self.wisdom = 6
+        self.legacy = 6
+        self.step_modifier = 0.05 # amount to apply per step off from default score of 6
+
     def load_images(self, directory):
         # parse description file and then load sprites from their spritesheets
         # print(f'Loading sprites from {directory}')
