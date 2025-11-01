@@ -50,10 +50,10 @@ def getPopes(filename) -> dict[int, PopeData]:
     for index, row in df.iterrows():
         p = PopeData()
         p.parseFromPandasRow(row)
-        img_filename = os.path.join(directory, f'{p.id:03d}.png')
+        img_filename = os.path.join(directory, 'png_images', f'cropped_{p.id:03d}.png')
         if pygame.get_init() and os.path.exists(img_filename):
             p.image = pygame.image.load(img_filename)
-            print(f'Loaded {img_filename}')
+            #print(f'Loaded {img_filename}')
         popes[p.id] = p
 
     return popes
