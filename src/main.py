@@ -199,6 +199,7 @@ def main_menu():
     frame_file = 'assets/images/frame.png'
     frame_offset = 98 # number of pixels in x & y in original scale that image portions starts
     frame_height_percent = 0.6 # % of screen height frame's height should occupy
+    shadow_offset = 5
     try:
         frame_img = pygame.image.load(frame_file).convert_alpha()
         scale_factor = SCREEN_HEIGHT * frame_height_percent / frame_img.get_height()
@@ -219,8 +220,10 @@ def main_menu():
             f2_x = SCREEN_WIDTH * 0.9 - frame_img.get_width()
             screen.blit(frame_img, (f1_x, f1_y))
             screen.blit(frame_img, (f2_x, f1_y))
-            pygame.draw.rect(screen, WHITE, (f1_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
-            pygame.draw.rect(screen, WHITE, (f2_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
+            vsImgShadow = gen_text_img('VS.', pygame.font.Font(font_name, int(SCREEN_HEIGHT * 0.1)), BLACK)
+            vsImg = gen_text_img('VS.', pygame.font.Font(font_name, int(SCREEN_HEIGHT * 0.1)), YELLOW)
+            screen.blit(vsImgShadow, ((SCREEN_WIDTH - vsImg.get_width() + shadow_offset) // 2, (SCREEN_HEIGHT - vsImg.get_height() + shadow_offset) // 2))
+            screen.blit(vsImg, ((SCREEN_WIDTH - vsImg.get_width()) // 2, (SCREEN_HEIGHT - vsImg.get_height()) // 2))
 
         elapsed_time = (pygame.time.get_ticks() - animation_start_time) / 1000
         scale_factor = 1 + 0.05 * math.sin(elapsed_time * 2 * math.pi)  # Slight scaling
@@ -232,7 +235,6 @@ def main_menu():
         title_x = SCREEN_WIDTH // 2 - scaled_font.size(title_text)[0] // 2
         title_y = SCREEN_HEIGHT * 0.05
 
-        shadow_offset = 5
         draw_text(title_text, scaled_font, shadow_color, title_x + shadow_offset, title_y + shadow_offset)
         draw_gradient_text(title_text, scaled_font, title_x, title_y, colors)
 
