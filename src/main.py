@@ -247,7 +247,8 @@ def main_menu():
             clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
             clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
 
-            # need to scan first pope
+            # need to scan second pope
+            pygame.draw.rect(screen, WHITE, (f2_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
             txt_img = gen_text_img('Scan Pope 2', menu_font, BLACK)
             txt_x = f2_x + (frame_img.get_width() - txt_img.get_width()) / 2
             txt_y = f1_y + (frame_img.get_height() - txt_img.get_height()) / 2
@@ -259,6 +260,7 @@ def main_menu():
             clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
         else:
             # need to scan first pope
+            pygame.draw.rect(screen, WHITE, (f1_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
             txt_img = gen_text_img('Scan Pope 1', menu_font, BLACK)
             txt_x = f1_x + (frame_img.get_width() - txt_img.get_width()) / 2
             txt_y = f1_y + (frame_img.get_height() - txt_img.get_height()) / 2
