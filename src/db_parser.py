@@ -44,7 +44,7 @@ def getPopes(filename) -> dict[int, PopeData]:
     print(f'Pope database directory: {directory}')
     df = pd.read_excel(filename, sheet_name=0)
     # print(df.head())
-    print(pygame.get_init())
+    #print(pygame.get_init())
 
     popes : dict[int, PopeData] = {}
     for index, row in df.iterrows():
