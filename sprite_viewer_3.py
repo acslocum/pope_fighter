@@ -29,8 +29,8 @@ def parseDescriptionFile(filename : str) -> dict:
                 pass
             else:
                 fields = line.strip().split(',')
-                if len(fields) == 4:
-                    dimensions = {'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3])}
+                if len(fields) == 5:
+                    dimensions = {'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : int(fields[4])}
                     description[fields[0]] = dimensions
         return description
 
@@ -42,6 +42,9 @@ if __name__ == "__main__":
     clock = pygame.time.Clock()
     FPS = 10
     running = True
+
+    pygame.font.init() # Initialize the font module
+    font = pygame.font.SysFont("Arial", 20) # Create a Font object
 
      # Extract sprites
     # spritesheet = pygame.image.load('/Users/sean/Documents/Fortress Party/Fortress Party 2025/godmodeAI/left_pope_walking_transparent.png').convert_alpha()
@@ -64,12 +67,14 @@ if __name__ == "__main__":
     #print(descriptions)
 
     sprites = []
+    loaded_y_offs = []
     for action in descriptions:
         action_dir = os.path.join(args.directory, action)
         sprite_file = os.path.join(action_dir, sheet_filename)
 
         sprite_layout = (descriptions[action]['columns'], descriptions[action]['rows']) # columns, rows - might not be complete
         num_sprites = descriptions[action]['count']
+        loaded_y_offs.append(descriptions[action]['y_off'])
 
         spritesheet = pygame.image.load(sprite_file).convert_alpha()
         action_sprites = get_sequence(spritesheet, sprite_layout, num_sprites)
@@ -82,6 +87,7 @@ if __name__ == "__main__":
     # exit()
     sequenceID = 0
     spriteID = 0
+    y_offsets = [0] * len(sprites) 
 
     #sprite_size = (spritesheet.get_width() // sprite_layout[0], spritesheet.get_height() // sprite_layout[1])
     #print(f'Sprite sheet dimensions: {spritesheet.get_size()}, image dimensions: {sprite_size}')
@@ -95,8 +101,18 @@ if __name__ == "__main__":
                 if event.key == pygame.K_SPACE:
                     sequenceID = (sequenceID + 1) % len(sprites)
                     spriteID = 0
+                elif event.key == pygame.K_UP:
+                    y_offsets[sequenceID] += 1
+                elif event.key == pygame.K_DOWN:
+                    y_offsets[sequenceID] -= 1
         screen.fill((0,0,0))
-        screen.blit(sprites[sequenceID][spriteID], (100, 100)) # Blit the sprite at coordinates (100, 100)
+        screen.blit(sprites[sequenceID][spriteID], (100, 100 + loaded_y_offs[sequenceID] + y_offsets[sequenceID])) # Blit the sprite at coordinates (100, 100)
+        pygame.draw.line(screen, (255,0,0), (0, 500), (799, 500), 5) 
+
+        offsetsText = ' '.join(str(y_offsets))
+        text_surface = font.render(offsetsText, True, (255, 255, 255)) # White text
+        screen.blit(text_surface, ((800 - text_surface.get_width()) // 2, 40))
+
         pygame.display.flip()
         clock.tick(FPS)
         # advance to next frame
