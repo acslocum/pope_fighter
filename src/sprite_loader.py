@@ -30,8 +30,8 @@ def parseDescriptionFile(filename : str) -> dict:
                 pass
             else:
                 fields = line.strip().split(',')
-                if len(fields) == 4:
-                    dimensions = {'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3])}
+                if len(fields) == 5:
+                    dimensions = {'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : int(fields[4])}
                     description[fields[0]] = dimensions
         return description
 
