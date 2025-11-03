@@ -1,7 +1,9 @@
 # filename, num columns, num rows, num images
-attack,4,6,21
-attack2,4,8,29
-death,4,8,29
-hit,4,7,25
-victory,4,8,29
-walking,4,7,28
+# 25, 43, 63, 79, 32, 88
+attack,4,6,21,25
+attack2,4,8,29,43
+death,4,8,29,63
+hit,4,7,25,79
+idle,4,8,29,0
+victory,4,8,29,32
+walking,4,7,28,88
