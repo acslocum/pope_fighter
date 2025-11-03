@@ -1,6 +1,16 @@
+from enum import Enum
 import pygame
 import os
 from sprite_loader import *
+
+class Actions(Enum):
+    ATTACK = 0
+    ATTACK2 = 1
+    DEATH = 2
+    HIT = 3
+    IDLE = 4
+    VICTORY = 5
+    WALKING = 6
 class Fighter:
     def __init__(self, player, x, y, flip, directory, sound):
         self.player = player
@@ -149,20 +159,20 @@ class Fighter:
         if self.health <= 0:
             self.health = 0
             self.alive = False
-            self.update_action(6)  # 6:death
+            self.update_action(Actions.DEATH.value)  # 6:death
         elif self.hit:
-            self.update_action(5)  # 5:hit
+            self.update_action(Actions.HIT.value)  # 5:hit
         elif self.attacking:
             if self.attack_type == 1:
-                self.update_action(3)  # 3:attack1
+                self.update_action(Actions.ATTACK.value)  # 3:attack1
             elif self.attack_type == 2:
-                self.update_action(4)  # 4:attack2
+                self.update_action(Actions.ATTACK2.value)  # 4:attack2
         elif self.jump:
-            self.update_action(2)  # 2:jump
+            self.update_action(Actions.VICTORY.value)  # 2:jump
         elif self.running:
-            self.update_action(1)  # 1:run
+            self.update_action(Actions.WALKING.value)  # 1:run
         else:
-            self.update_action(0)  # 0:idle
+            self.update_action(Actions.IDLE.value)  # 0:idle
 
         animation_cooldown = 50
         # update image
@@ -179,11 +189,11 @@ class Fighter:
             else:
                 self.frame_index = 0
                 # check if an attack was executed
-                if self.action == 3 or self.action == 4:
+                if self.action == Actions.ATTACK.value or self.action == Actions.ATTACK2.value:
                     self.attacking = False
                     self.attack_cooldown = 20
                 # check if damage was taken
-                if self.action == 5:
+                if self.action == Actions.HIT.value:
                     self.hit = False
                     # if the player was in the middle of an attack, then the attack is stopped
                     self.attacking = False
