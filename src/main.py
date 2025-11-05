@@ -5,6 +5,7 @@ from pygame import font
 import cv2
 import numpy as np
 import os
+import re
 import sys
 from fighter import Fighter
 import db_parser
@@ -57,7 +58,7 @@ menu_font = pygame.font.Font(resource_path(font_name), 50)
 menu_font_title = pygame.font.Font(resource_path(font_name), 100)  # Larger font for title
 count_font = pygame.font.Font(resource_path(font_name), 80)
 score_font = pygame.font.Font(resource_path(font_name), 30)
-
+frame_font = pygame.font.SysFont('Arial', 20, bold=True, italic=False)
 # Music and Sounds
 pygame.mixer.music.load(resource_path("assets/audio/music.mp3"))
 pygame.mixer.music.set_volume(0.5)
@@ -196,6 +197,9 @@ def main_menu():
     requiredScanLength = 3 + len(prefix) + len(suffix) # required length of keys to grab from a scan
     global left_pope
     global right_pope
+    left_pope_name = None
+    right_pope_name = None
+    lastPopeID = None # keep track of previously scanned pope ID so it doesn't get scanned twice
     frame_file = 'assets/images/frame.png'
     frame_offset = 98 # number of pixels in x & y in original scale that image portions starts
     frame_height_percent = 0.6 # % of screen height frame's height should occupy
@@ -258,6 +262,8 @@ def main_menu():
             clear_button_x = SCREEN_WIDTH * 0.9 - frame_img.get_width() + (frame_img.get_width() - button_width) // 2
             clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
             clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
+            start_button = draw_button("START GAME", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+                                       SCREEN_HEIGHT * 0.75, button_width, button_height)
         else:
             # need to scan first pope
             pygame.draw.rect(screen, WHITE, (f1_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
@@ -271,11 +277,21 @@ def main_menu():
             sx = f1_x + (frame_img.get_width() - scaled_img.get_width()) / 2
             sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
             screen.blit(scaled_img, (sx,sy))
+            if left_pope_name is not None:
+                lpn_img = gen_text_img(left_pope_name, frame_font, BLACK)
+                lpn_x = f1_x + (frame_img.get_width() - lpn_img.get_width()) // 2
+                lpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - lpn_img.get_height()) // 2
+                screen.blit(lpn_img, (lpn_x, lpn_y))
         if right_pope is not None and right_pope.image is not None:
             scaled_img = aspect_scale(right_pope.image, img_size)
             sx = f2_x + (frame_img.get_width() - scaled_img.get_width()) / 2
             sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
             screen.blit(scaled_img, (sx,sy))
+            if right_pope_name is not None:
+                rpn_img = gen_text_img(right_pope_name, frame_font, BLACK)
+                rpn_x = f2_x + (frame_img.get_width() - rpn_img.get_width()) // 2
+                rpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - rpn_img.get_height()) // 2
+                screen.blit(rpn_img, (rpn_x, rpn_y))
             
         #scores_button_y = SCREEN_HEIGHT // 2 - (button_height + button_spacing) * 0.5 + 50
         #exit_button_y = SCREEN_HEIGHT // 2 + (button_height + button_spacing) * 0.5 + 50
@@ -292,8 +308,8 @@ def main_menu():
                 pygame.quit()
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # if start_button.collidepoint(event.pos):
-                #     return "START"
+                if start_button.collidepoint(event.pos):
+                    return "START"
                 # if scores_button.collidepoint(event.pos):
                 #     return "SCORES"
                 # if exit_button.collidepoint(event.pos):
@@ -302,23 +318,32 @@ def main_menu():
                 pass
             elif event.type == pygame.KEYDOWN:
                 #print(len(pygame.key.name(event.key)))
-                scanned += event.unicode.upper()
-                print(scanned)
-                if len(scanned) == requiredScanLength:
-                    if scanned.startswith(prefix) and scanned.endswith(suffix):
-                        id = int(scanned[1:4])
-                        if id in popeDB:
+                #scanned += event.unicode.upper()
+                scanned += event.unicode
+                #pattern = r"\d{3}" 
+                if scanned.startswith('https://') and re.search(r"\d{3}", scanned) is not None:
+                    print(scanned)
+                    lastSlashIndex = scanned.rfind('/')
+                    lastSlashIndex += 1
+                    if lastSlashIndex != -1:
+                        id = int(scanned[lastSlashIndex:])
+                        if lastPopeID != id and id in popeDB:
+                            lastPopeID = id
                             pope = popeDB[id]
                             print(f'Scanned in pope ID: {id}, {pope.name}')
                             if left_pope is None:
                                 left_pope = pope
+                                left_pope_name = pope.name
                             elif right_pope is None:
                                 right_pope = pope
+                                right_pope_name = pope.name
 
                             # check to see if we have two popes
                             if left_pope and right_pope:
                                 print(f'We\'ve got a match {left_pope.name} vs. {right_pope.name}')
                                 #return "START"
+                        elif lastPopeID == id:
+                            print(f'Ignoring duplicate scane for {id}')
                         else:
                             print(f'Scanned in unknown pope ID: {id}')
                     else:
