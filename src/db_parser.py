@@ -1,3 +1,4 @@
+import json
 import os
 import pandas as pd
 import pygame
@@ -22,6 +23,9 @@ class PopeData:
 
     def __str__(self):
         return f'{self.id}, {self.name}'
+    
+    def statsString(self):
+        return f'{self.id}, {self.name}, {self.holiness}, {self.miracles}, {self.wisdom}, {self.legacy}, {self.length_of_reign}'
 
     def parseFromPandasRow(self, row):
         self.name = str(row['name'])
@@ -38,6 +42,18 @@ class PopeData:
         self.legacy = int(row['Legacy'])
         self.image_file = str(row['Image'])
         self.length_of_reign = float(row['Length_of_Reign'])
+
+    def updateFromJSON(self, jsonData):
+        data = json.loads(jsonData)
+        if self.id != data['ID']:
+            return
+        
+        self.holiness = int(data['holiness'])
+        self.miracles = int(data['miracles'])
+        self.wisdom = int(data['wisdom'])
+        self.legacy = int(data['legacy'])
+        self.length_of_reign = float(data['length_of_reign'])
+        #print(self.statsString())
 
 def getPopes(filename) -> dict[int, PopeData]:
     directory = os.path.dirname(filename)

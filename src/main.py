@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import os
 import re
+import requests
 import sys
 from fighter import Fighter
 import db_parser
@@ -69,6 +70,9 @@ magic_fx = pygame.mixer.Sound(resource_path("assets/audio/magic.wav"))
 magic_fx.set_volume(0.75)
 
 # declare pope IDs
+popeServerBaseURL = 'http://localhost:3000/'
+popeIDEndpoint = 'pope/'
+popeServerURL = popeServerBaseURL + popeIDEndpoint
 left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
 popeDB = db_parser.getPopes('assets/db/Pope-mon_stats.xlsx')
@@ -326,11 +330,26 @@ def main_menu():
                     lastSlashIndex = scanned.rfind('/')
                     lastSlashIndex += 1
                     if lastSlashIndex != -1:
-                        id = int(scanned[lastSlashIndex:])
+                        strID = scanned[lastSlashIndex:]
+                        id = int(strID)
                         if lastPopeID != id and id in popeDB:
                             lastPopeID = id
                             pope = popeDB[id]
-                            print(f'Scanned in pope ID: {id}, {pope.name}')
+                            print(f'Scanned in pope ID: {id}, {pope.name}, querying server...')
+                            response = None
+                            try:
+                                # Set a timeout of 0.5 seconds (500 milliseconds)
+                                response = requests.get(popeServerURL + strID, timeout=0.5)
+                                # print(f"Request successful with status code: {response.status_code}")
+                                # print(response.content)
+                                pope.updateFromJSON(response.content)
+                            except requests.exceptions.Timeout:
+                                print("The request timed out after 500 milliseconds.")
+                                response = None
+                            except requests.exceptions.RequestException as e:
+                                print(f"An error occurred: {e}")
+                                response = None
+
                             if left_pope is None:
                                 left_pope = pope
                                 left_pope_name = pope.name
