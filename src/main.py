@@ -79,26 +79,6 @@ left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
 popeDB = db_parser.getPopes('assets/db/Pope-mon_stats.xlsx')
 
-# Load Fighter Spritesheets
-warrior_sheet = pygame.image.load(resource_path("assets/images/warrior.png")).convert_alpha()
-wizard_sheet = pygame.image.load(resource_path("assets/images/wizard.png")).convert_alpha()
-
-# Define Animation Steps: # 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
-WARRIOR_ANIMATION_STEPS = [10, 8, 1, 7, 7, 3, 7]
-WIZARD_ANIMATION_STEPS = [8, 8, 1, 8, 8, 3, 7]
-
-# Fighter Data
-WARRIOR_SIZE = 162
-#WARRIOR_SCALE = 4
-WARRIOR_SCALE = 8
-WARRIOR_OFFSET = [72, 46]
-WARRIOR_OFFSET = [50, 80]
-WARRIOR_DATA = [WARRIOR_SIZE, WARRIOR_SCALE, WARRIOR_OFFSET]
-WIZARD_SIZE = 250
-WIZARD_SCALE = 6
-WIZARD_OFFSET = [50, 140]
-WIZARD_DATA = [WIZARD_SIZE, WIZARD_SCALE, WIZARD_OFFSET]
-
 # Game Variables
 score = [0, 0]  # Player Scores: [P1, P2]
 
