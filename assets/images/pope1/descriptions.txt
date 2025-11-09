@@ -4,6 +4,6 @@ attack,4,6,21,25
 attack2,4,8,29,43
 death,4,8,29,63
 hit,4,7,25,79
-idle,4,8,29,0
+idle,4,8,29,74
 victory,4,8,29,32
 walking,4,7,28,88
