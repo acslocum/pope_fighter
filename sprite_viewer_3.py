@@ -30,9 +30,9 @@ def parseDescriptionFile(filename : str) -> dict:
             else:
                 fields = line.strip().split(',')
                 if len(fields) == 5:
-                    dimensions = {'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : int(fields[4])}
+                    dimensions = {'action' : fields[0], 'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : int(fields[4])}
                 elif len(fields) == 4:
-                    dimensions = {'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : 0}
+                    dimensions = {'action' : fields[0], 'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : 0}
                 
                 description[fields[0]] = dimensions
         return description
@@ -71,7 +71,9 @@ if __name__ == "__main__":
 
     sprites = []
     loaded_y_offs = []
+    actions : list[str] = []
     for action in descriptions:
+        actions.append(action)
         action_dir = os.path.join(args.directory, action)
         sprite_file = os.path.join(action_dir, sheet_filename)
 
@@ -114,7 +116,7 @@ if __name__ == "__main__":
         pygame.draw.line(screen, (255,0,0), (0, 500), (799, 500), 5) 
 
         offsetsText = ' '.join(str(y_offsets))
-        text_surface = font.render(offsetsText, True, (255, 255, 255)) # White text
+        text_surface = font.render(actions[sequenceID] + ' ' + offsetsText, True, (255, 255, 255)) # White text
         screen.blit(text_surface, ((800 - text_surface.get_width()) // 2, 40))
 
         pygame.display.flip()
