@@ -228,3 +228,9 @@ class Fighter:
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
         surface.blit(img, (self.rect.x - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)))
+        if self.debug:
+            # draw a circle at sprite center and a hit box
+            #print('Drawing indicators')
+            center = (self.rect.centerx, self.rect.centery)
+            pygame.draw.circle(surface, (255,255,255), center, 5)
+            pygame.draw.rect(surface, (255,0,0), self.rect, width = 1)
