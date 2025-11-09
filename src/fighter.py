@@ -75,7 +75,7 @@ class Fighter:
         return sprites
 
     def move(self, screen_width, screen_height, target, round_over):
-        SPEED = 10
+        SPEED = 5
         GRAVITY = 2
         dx = 0
         dy = 0
