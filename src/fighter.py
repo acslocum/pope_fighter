@@ -2,6 +2,7 @@ from enum import Enum
 import pygame
 import os
 from sprite_loader import *
+from PopeData import PopeData
 
 class Actions(Enum):
     ATTACK = 0
@@ -12,8 +13,9 @@ class Actions(Enum):
     VICTORY = 5
     WALKING = 6
 class Fighter:
-    def __init__(self, player, x, y, flip, directory, sound):
+    def __init__(self, player, x, y, flip, directory, sound, pope : PopeData = None):
         self.player = player
+        self.popeData = PopeData
         self.flip = flip
         self.animation_list = self.load_images(directory)
         self.image_scale = 8
@@ -40,6 +42,11 @@ class Fighter:
         self.miracles = 6
         self.wisdom = 6
         self.legacy = 6
+        if pope is not None:
+            self.holiness = pope.holiness
+            self.miracles = pope.miracles
+            self.wisdom = pope.wisdom
+            self.legacy = pope.legacy
         self.step_modifier = 0.05 # amount to apply per step off from default score of 6
 
     def load_images(self, directory):
