@@ -31,7 +31,10 @@ def parseDescriptionFile(filename : str) -> dict:
                 fields = line.strip().split(',')
                 if len(fields) == 5:
                     dimensions = {'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : int(fields[4])}
-                    description[fields[0]] = dimensions
+                elif len(fields) == 4:
+                    dimensions = {'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : 0}
+                
+                description[fields[0]] = dimensions
         return description
 
 
@@ -87,7 +90,8 @@ if __name__ == "__main__":
     # exit()
     sequenceID = 0
     spriteID = 0
-    y_offsets = [0] * len(sprites) 
+    #y_offsets = [0] * len(sprites) 
+    y_offsets = loaded_y_offs
 
     #sprite_size = (spritesheet.get_width() // sprite_layout[0], spritesheet.get_height() // sprite_layout[1])
     #print(f'Sprite sheet dimensions: {spritesheet.get_size()}, image dimensions: {sprite_size}')
@@ -106,7 +110,7 @@ if __name__ == "__main__":
                 elif event.key == pygame.K_DOWN:
                     y_offsets[sequenceID] -= 1
         screen.fill((0,0,0))
-        screen.blit(sprites[sequenceID][spriteID], (100, 100 + loaded_y_offs[sequenceID] + y_offsets[sequenceID])) # Blit the sprite at coordinates (100, 100)
+        screen.blit(sprites[sequenceID][spriteID], (100, 100 + y_offsets[sequenceID])) # Blit the sprite at coordinates (100, 100)
         pygame.draw.line(screen, (255,0,0), (0, 500), (799, 500), 5) 
 
         offsetsText = ' '.join(str(y_offsets))
