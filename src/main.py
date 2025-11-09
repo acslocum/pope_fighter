@@ -31,6 +31,8 @@ SCREEN_WIDTH = 1778
 SCREEN_HEIGHT = 1000
 FPS = 60
 ROUND_OVER_COOLDOWN = 3000
+# variables for game debugging purposes
+game_debug = True
 
 # Colors
 RED = (255, 0, 0)
@@ -417,6 +419,10 @@ def reset_game():
     # fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
     fighter_1 = Fighter(1, 200, 310, False, 'assets/images/pope1', sword_fx, left_pope)
     fighter_2 = Fighter(2, 700, 310, True, 'assets/images/pope2', magic_fx, right_pope)
+    if game_debug:
+        print('Enable debug for fighters')
+        fighter_1.debug = True
+        fighter_2.debug = True
 
 def draw_health_bar(health, x, y):
     pygame.draw.rect(screen, BLACK, (x, y, 200, 20))
@@ -449,13 +455,23 @@ def game_loop():
     winner_img = None
     game_started = True
 
+    baseline_ypos = 0.8 # % down the screen for the line players stand on
+
     countdown()
 
     while True:
         draw_bg(bg_image, is_game_started=game_started)
 
-        draw_text(f"P1: {score[0]}", score_font, WHITE, 20, 20)
-        draw_text(f"P2: {score[1]}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
+        p1_name = left_pope.name if left_pope is not None else 'P1'
+        p2_name = right_pope.name if right_pope is not None else 'P2'
+        if game_debug:
+            p1_name = 'Pope Testus I'
+            p2_name = 'Pope Beta IV'
+
+        #draw_text(f"P1: {score[0]}", score_font, WHITE, 20, 20)
+        #draw_text(f"P2: {score[1]}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
+        draw_text(f"{p1_name}", score_font, WHITE, 20, 20)
+        draw_text(f"{p2_name}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
         draw_health_bar(fighter_1.health, 20, 50)
         draw_health_bar(fighter_2.health, SCREEN_WIDTH - 220, 50)
 
@@ -483,6 +499,9 @@ def game_loop():
         fighter_1.draw(screen)
         fighter_2.draw(screen)
 
+        if game_debug:
+            pygame.draw.line(screen, (255,255,0), (0, SCREEN_HEIGHT * baseline_ypos), (SCREEN_WIDTH, SCREEN_HEIGHT * baseline_ypos), width=3)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -496,9 +515,12 @@ def game_loop():
 
 
 while True:
-    menu_selection = main_menu()
-
-    if menu_selection == "START":
+    if game_debug:
         game_loop()
-    elif menu_selection == "SCORES":
-        scores_screen()
+    else:
+        menu_selection = main_menu()
+
+        if menu_selection == "START":
+            game_loop()
+        elif menu_selection == "SCORES":
+            scores_screen()
