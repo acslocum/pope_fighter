@@ -406,8 +406,12 @@ def reset_game():
 
 def draw_health_bar(health, x, y):
     pygame.draw.rect(screen, BLACK, (x, y, 200, 20))
-    if health > 0:
-        pygame.draw.rect(screen, WHITE, (x, y, health * 2, 20))
+    if 0 < health <= 25:
+        pygame.draw.rect(screen, RED, (x, y, health * 2, 20))
+    elif 25 < health <= 50:
+        pygame.draw.rect(screen, YELLOW, (x, y, health * 2, 20))
+    elif 50 < health <= 100:
+        pygame.draw.rect(screen, GREEN, (x, y, health * 2, 20))
     pygame.draw.rect(screen, WHITE, (x, y, 200, 20), 2)
 
 
