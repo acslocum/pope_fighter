@@ -397,8 +397,8 @@ def reset_game():
     global fighter_1, fighter_2
     # fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
     # fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
-    fighter_1 = Fighter(1, 200, 310, False, 'assets/images/pope1', sword_fx, left_pope)
-    fighter_2 = Fighter(2, 700, 310, True, 'assets/images/pope2', magic_fx, right_pope)
+    fighter_1 = Fighter(1, 0.2 * SCREEN_WIDTH, 310, False, 'assets/images/pope1', sword_fx, left_pope)
+    fighter_2 = Fighter(2, 0.8 * SCREEN_WIDTH, 310, True, 'assets/images/pope2', magic_fx, right_pope)
     if game_debug:
         print('Enable debug for fighters')
         fighter_1.debug = True
