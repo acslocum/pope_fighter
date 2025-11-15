@@ -26,6 +26,7 @@ class Fighter:
         self.size = self.image.get_height() # probably should change to actual size, or fix spritesheets so sprites are square
         self.update_time = pygame.time.get_ticks()
         self.rect = pygame.Rect((x, y, 80, 180))
+        self.attacking_rect = self.rect
         self.vel_y = 0
         self.running = False
         self.jump = False
@@ -160,6 +161,10 @@ class Fighter:
         self.rect.x += dx
         self.rect.y += dy
 
+        # update attack rect
+        self.attacking_rect = pygame.Rect(self.rect.centerx - (2 * self.rect.width * self.flip), self.rect.y,
+                                2 * self.rect.width, self.rect.height)
+
     # handle animation updates
     def update(self):
         # check what action the player is performing
@@ -211,9 +216,8 @@ class Fighter:
             # execute attack
             self.attacking = True
             self.attack_sound.play()
-            attacking_rect = pygame.Rect(self.rect.centerx - (2 * self.rect.width * self.flip), self.rect.y,
-                                         2 * self.rect.width, self.rect.height)
-            if attacking_rect.colliderect(target.rect):
+
+            if self.attacking_rect.colliderect(target.rect):
                 target.health -= 10
                 target.hit = True
 
@@ -234,3 +238,4 @@ class Fighter:
             center = (self.rect.centerx, self.rect.centery)
             pygame.draw.circle(surface, (255,255,255), center, 5)
             pygame.draw.rect(surface, (255,0,0), self.rect, width = 1)
+            pygame.draw.rect(surface, (255,255,0), self.attacking_rect, width = 1)
