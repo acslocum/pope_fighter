@@ -20,6 +20,7 @@ def get_sequence(sheet : pygame.Surface, sheet_dim : tuple[int], num_images : in
                 count += 1
 
     #print(f'Sprite size: {sprite_w} x {sprite_h}')
+    #print(f'get_sequence return type: {type(sprite_sequence)}')
     return sprite_sequence
 
 def parseDescriptionFile(filename : str) -> dict:
