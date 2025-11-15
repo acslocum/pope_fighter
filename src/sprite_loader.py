@@ -7,7 +7,7 @@ def get_sprite_from_sheet(sheet, x, y, width, height) -> pygame.Surface:
     image.blit(sheet, (0, 0), (x, y, width, height))
     return image
 
-def get_sequence(sheet : pygame.Surface, sheet_dim : tuple[int], num_images : int) -> list[list[pygame.Surface]]:
+def get_sequence(sheet : pygame.Surface, sheet_dim : tuple[int], num_images : int) -> list[pygame.Surface]:
     sprite_sequence = []
     sprite_w = sheet.get_width() // sheet_dim[0]
     sprite_h = sheet.get_height() // sheet_dim[1]
