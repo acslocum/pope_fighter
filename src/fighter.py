@@ -50,7 +50,7 @@ class Fighter:
             self.legacy = pope.legacy
         self.step_modifier = 0.05 # amount to apply per step off from default score of 6
 
-    def load_images(self, directory):
+    def load_images(self, directory) -> list[list[pygame.Surface]]:
         # parse description file and then load sprites from their spritesheets
         # print(f'Loading sprites from {directory}')
         desc_filename = 'descriptions.txt' # there should be one of these at the top of each character dir
