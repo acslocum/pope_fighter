@@ -137,7 +137,7 @@ class Fighter:
         dy += self.vel_y
 
         # ensure player stays on screen
-        screen_bottom_offset = 200
+        screen_bottom_offset = screen_height * 0.2
         if self.rect.left + dx < 0:
             dx = -self.rect.left
         if self.rect.right + dx > screen_width:
