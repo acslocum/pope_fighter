@@ -17,10 +17,10 @@ class Fighter:
         self.player = player
         self.popeData = PopeData
         self.flip = flip
-        self.animation_list = self.load_images(directory)
-        self.image_scale = 8
-        self.offset = (0,0)
-        self.action = 0  # 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
+        self.offset : list[tuple[int]] = []
+        self.animation_list : list[list[pygame.Surface]] = self.load_images(directory)
+        self.image_scale = 2
+        self.action = Actions.IDLE.value  # 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.size = self.image.get_height() # probably should change to actual size, or fix spritesheets so sprites are square
@@ -58,10 +58,11 @@ class Fighter:
 
         desc_file = os.path.join(directory, desc_filename)
         descriptions = parseDescriptionFile(desc_file)
-        #print(descriptions)
+        #print(f'Player {self.player} descriptions: {descriptions}')
 
         sprites = []
         for action in descriptions:
+            self.offset.append( (descriptions[action]['x_off'], descriptions[action]['y_off']) )
             action_dir = os.path.join(directory, action)
             sprite_file = os.path.join(action_dir, sheet_filename)
 
@@ -231,7 +232,12 @@ class Fighter:
 
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
-        surface.blit(img, (self.rect.x - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)))
+        if 0 <= self.action < len(self.offset):
+            offset = self.offset[self.action]
+        else:
+            offset = (0,0)
+        #print(f'Fighter::draw: offset: {offset}')
+        surface.blit(img, (self.rect.x - (offset[0] * self.image_scale), self.rect.y - (offset[1] * self.image_scale)))
         if self.debug:
             # draw a circle at sprite center and a hit box
             #print('Drawing indicators')
