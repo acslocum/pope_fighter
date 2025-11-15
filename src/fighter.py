@@ -74,6 +74,7 @@ class Fighter:
 
             sprites.append(action_sprites)
 
+        # print(f'Player {self.player} offsets: {self.offset}')
         return sprites
 
     def move(self, screen_width, screen_height, target, round_over):
