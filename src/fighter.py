@@ -19,7 +19,7 @@ class Fighter:
         self.flip = flip
         self.offset : list[tuple[int]] = []
         self.animation_list : list[list[pygame.Surface]] = self.load_images(directory)
-        self.image_scale = 2
+        self.image_scale = 1
         self.action = Actions.IDLE.value  # 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]

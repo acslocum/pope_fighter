@@ -29,7 +29,9 @@ def parseDescriptionFile(filename : str) -> dict:
                 pass
             else:
                 fields = line.strip().split(',')
-                if len(fields) == 5:
+                if len(fields) == 6:
+                    dimensions = {'action' : fields[0], 'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'x_off' : int(fields[4]), 'y_off' : int(fields[5])}
+                elif len(fields) == 5:
                     dimensions = {'action' : fields[0], 'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : int(fields[4])}
                 elif len(fields) == 4:
                     dimensions = {'action' : fields[0], 'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : 0}
@@ -41,6 +43,7 @@ def parseDescriptionFile(filename : str) -> dict:
 
 if __name__ == "__main__":
     pygame.init()
+    pygame.key.set_repeat(50,50)
     screen = pygame.display.set_mode((800,600))
     clock = pygame.time.Clock()
     FPS = 10
@@ -70,7 +73,7 @@ if __name__ == "__main__":
     #print(descriptions)
 
     sprites = []
-    loaded_y_offs = []
+    loaded_offs = []
     actions : list[str] = []
     for action in descriptions:
         actions.append(action)
@@ -79,7 +82,7 @@ if __name__ == "__main__":
 
         sprite_layout = (descriptions[action]['columns'], descriptions[action]['rows']) # columns, rows - might not be complete
         num_sprites = descriptions[action]['count']
-        loaded_y_offs.append(descriptions[action]['y_off'])
+        loaded_offs.append( (descriptions[action]['x_off'], descriptions[action]['y_off']) )
 
         spritesheet = pygame.image.load(sprite_file).convert_alpha()
         action_sprites = get_sequence(spritesheet, sprite_layout, num_sprites)
@@ -93,7 +96,6 @@ if __name__ == "__main__":
     sequenceID = 0
     spriteID = 0
     #y_offsets = [0] * len(sprites) 
-    y_offsets = loaded_y_offs
 
     #sprite_size = (spritesheet.get_width() // sprite_layout[0], spritesheet.get_height() // sprite_layout[1])
     #print(f'Sprite sheet dimensions: {spritesheet.get_size()}, image dimensions: {sprite_size}')
@@ -107,15 +109,27 @@ if __name__ == "__main__":
                 if event.key == pygame.K_SPACE:
                     sequenceID = (sequenceID + 1) % len(sprites)
                     spriteID = 0
-                elif event.key == pygame.K_UP:
-                    y_offsets[sequenceID] += 1
-                elif event.key == pygame.K_DOWN:
-                    y_offsets[sequenceID] -= 1
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_UP]:
+                loaded_offs[sequenceID] = (loaded_offs[sequenceID][0], loaded_offs[sequenceID][1] - 1)
+            if keys[pygame.K_DOWN]:
+                loaded_offs[sequenceID] = (loaded_offs[sequenceID][0], loaded_offs[sequenceID][1] + 1)
+            if keys[pygame.K_LEFT]:
+                loaded_offs[sequenceID] = (loaded_offs[sequenceID][0] - 1, loaded_offs[sequenceID][1])
+            if keys[pygame.K_RIGHT]:
+                loaded_offs[sequenceID] = (loaded_offs[sequenceID][0] + 1, loaded_offs[sequenceID][1])
+        
         screen.fill((0,0,0))
-        screen.blit(sprites[sequenceID][spriteID], (100, 100 + y_offsets[sequenceID])) # Blit the sprite at coordinates (100, 100)
+        x = 100
+        y = 100
+        screen.blit(sprites[sequenceID][spriteID], (x - loaded_offs[sequenceID][0], y - loaded_offs[sequenceID][1])) # Blit the sprite at coordinates (100, 100)
+        player_rect = pygame.Rect((x, y, 80, 180))
+        pygame.draw.rect(screen, (255,0,0), player_rect, width = 1)
+
         pygame.draw.line(screen, (255,0,0), (0, 500), (799, 500), 5) 
 
-        offsetsText = ' '.join(str(y_offsets))
+        offsetsText = str(loaded_offs[sequenceID])
         text_surface = font.render(actions[sequenceID] + ' ' + offsetsText, True, (255, 255, 255)) # White text
         screen.blit(text_surface, ((800 - text_surface.get_width()) // 2, 40))
 
@@ -123,3 +137,8 @@ if __name__ == "__main__":
         clock.tick(FPS)
         # advance to next frame
         spriteID = (spriteID + 1) % len(sprites[sequenceID])
+
+    i = 0
+    for action in descriptions:
+        print(f'{action}: {loaded_offs[i]}')
+        i += 1
