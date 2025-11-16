@@ -32,6 +32,7 @@ SCREEN_HEIGHT = 1000
 FPS = 60
 ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
+game_debug = False
 game_debug = True
 
 # Colors

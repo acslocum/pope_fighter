@@ -38,6 +38,8 @@ class Fighter:
         self.health = 100
         self.alive = True
 
+        self.debug = False
+
         # pope specifc mods
         self.holiness = 6
         self.miracles = 6
