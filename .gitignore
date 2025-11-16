@@ -21,3 +21,5 @@ Thumbs.db
 .idea/
 .vscode/
 .venv/
+
+assets/db/qr_codes/
