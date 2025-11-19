@@ -29,7 +29,9 @@ def parseDescriptionFile(filename : str) -> dict:
                 pass
             else:
                 fields = line.strip().split(',')
-                if len(fields) == 6:
+                if len(fields) == 7:
+                    dimensions = {'action' : fields[0], 'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'x_off' : int(fields[4]), 'y_off' : int(fields[5]), 'scale' : float(fields[6])}
+                elif len(fields) == 6:
                     dimensions = {'action' : fields[0], 'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'x_off' : int(fields[4]), 'y_off' : int(fields[5])}
                 elif len(fields) == 5:
                     dimensions = {'action' : fields[0], 'rows' : int(fields[2]), 'columns' : int(fields[1]), 'count' : int(fields[3]), 'y_off' : int(fields[4])}
@@ -74,6 +76,7 @@ if __name__ == "__main__":
 
     sprites = []
     loaded_offs = []
+    scales = []
     actions : list[str] = []
     for action in descriptions:
         actions.append(action)
@@ -83,6 +86,7 @@ if __name__ == "__main__":
         sprite_layout = (descriptions[action]['columns'], descriptions[action]['rows']) # columns, rows - might not be complete
         num_sprites = descriptions[action]['count']
         loaded_offs.append( (descriptions[action]['x_off'], descriptions[action]['y_off']) )
+        scales.append(descriptions[action]['scale'])
 
         spritesheet = pygame.image.load(sprite_file).convert_alpha()
         action_sprites = get_sequence(spritesheet, sprite_layout, num_sprites)
@@ -119,18 +123,28 @@ if __name__ == "__main__":
                 loaded_offs[sequenceID] = (loaded_offs[sequenceID][0] - 1, loaded_offs[sequenceID][1])
             if keys[pygame.K_RIGHT]:
                 loaded_offs[sequenceID] = (loaded_offs[sequenceID][0] + 1, loaded_offs[sequenceID][1])
+            if keys[pygame.K_EQUALS]:
+                scales[sequenceID] = scales[sequenceID] + 0.1
+            if keys[pygame.K_MINUS]:
+                scales[sequenceID] = scales[sequenceID] - 0.1
         
         screen.fill((0,0,0))
         x = 100
         y = 100
-        screen.blit(sprites[sequenceID][spriteID], (x - loaded_offs[sequenceID][0], y - loaded_offs[sequenceID][1])) # Blit the sprite at coordinates (100, 100)
-        player_rect = pygame.Rect((x, y, 80, 180))
+        width = 240
+        height = 480
+        img = sprites[sequenceID][spriteID]
+        scale = scales[sequenceID]
+        scaledImg = pygame.transform.scale(img, (img.get_width() * scale, img.get_height() * scale))
+        screen.blit(scaledImg, (x - loaded_offs[sequenceID][0], y - loaded_offs[sequenceID][1])) # Blit the sprite at coordinates (100, 100)
+        player_rect = pygame.Rect((x, y, width, height))
         pygame.draw.rect(screen, (255,0,0), player_rect, width = 1)
 
-        pygame.draw.line(screen, (255,0,0), (0, 500), (799, 500), 5) 
+        pygame.draw.line(screen, (255,0,0), (0, y + height), (799, y + height), 5) 
 
         offsetsText = str(loaded_offs[sequenceID])
-        text_surface = font.render(actions[sequenceID] + ' ' + offsetsText, True, (255, 255, 255)) # White text
+        scaleText = str(scales[sequenceID])
+        text_surface = font.render(actions[sequenceID] + ' ' + offsetsText + ' ' + scaleText, True, (255, 255, 255)) # White text
         screen.blit(text_surface, ((800 - text_surface.get_width()) // 2, 40))
 
         pygame.display.flip()
@@ -140,5 +154,5 @@ if __name__ == "__main__":
 
     i = 0
     for action in descriptions:
-        print(f'{action}: {loaded_offs[i]}')
+        print(f'{action}: {loaded_offs[i]}, {scales[i]}')
         i += 1

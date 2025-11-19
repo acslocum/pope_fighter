@@ -8,16 +8,17 @@ class Actions(Enum):
     ATTACK = 0
     ATTACK2 = 1
     DEATH = 2
-    HIT = 3
-    IDLE = 4
-    VICTORY = 5
-    WALKING = 6
+    #HIT = 3
+    IDLE = 3
+    #VICTORY = 5
+    WALKING = 4
 class Fighter:
     def __init__(self, player, x, y, flip, directory, sound, pope : PopeData = None):
         self.player = player
         self.popeData = PopeData
         self.flip = flip
         self.offset : list[tuple[int]] = []
+        self.loadedScales : list[int] = []
         self.animation_list : list[list[pygame.Surface]] = self.load_images(directory)
         self.image_scale = 1
         self.action = Actions.IDLE.value  # 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
@@ -25,7 +26,9 @@ class Fighter:
         self.image = self.animation_list[self.action][self.frame_index]
         self.size = self.image.get_height() # probably should change to actual size, or fix spritesheets so sprites are square
         self.update_time = pygame.time.get_ticks()
-        self.rect = pygame.Rect((x, y, 80, 180))
+        self.rect = pygame.Rect((x, y, int(240 * self.image_scale * self.loadedScales[self.action]), int(480 * self.image_scale) * self.loadedScales[self.action]))
+        if self.flip:
+            self.rect.x = self.rect.x - 240 * self.image_scale
         self.attacking_rect = self.rect
         self.vel_y = 0
         self.running = False
@@ -65,6 +68,7 @@ class Fighter:
         sprites = []
         for action in descriptions:
             self.offset.append( (descriptions[action]['x_off'], descriptions[action]['y_off']) )
+            self.loadedScales.append(descriptions[action]['scale'])
             action_dir = os.path.join(directory, action)
             sprite_file = os.path.join(action_dir, sheet_filename)
 
@@ -209,11 +213,11 @@ class Fighter:
                     self.attacking = False
                     self.attack_cooldown = 20
                 # check if damage was taken
-                if self.action == Actions.HIT.value:
-                    self.hit = False
-                    # if the player was in the middle of an attack, then the attack is stopped
-                    self.attacking = False
-                    self.attack_cooldown = 20
+                # if self.action == Actions.HIT.value:
+                #     self.hit = False
+                #     # if the player was in the middle of an attack, then the attack is stopped
+                #     self.attacking = False
+                #     self.attack_cooldown = 20
 
     def attack(self, target):
         if self.attack_cooldown == 0:
@@ -240,7 +244,10 @@ class Fighter:
         else:
             offset = (0,0)
         #print(f'Fighter::draw: offset: {offset}')
-        surface.blit(img, (self.rect.x - (offset[0] * self.image_scale), self.rect.y - (offset[1] * self.image_scale)))
+        x_off = offset[0]
+        if self.flip:
+            x_off = img.get_width() - x_off - self.rect.width
+        surface.blit(img, (self.rect.x - (x_off * self.image_scale), self.rect.y - (offset[1] * self.image_scale)))
         if self.debug:
             # draw a circle at sprite center and a hit box
             #print('Drawing indicators')

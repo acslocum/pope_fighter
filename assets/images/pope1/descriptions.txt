@@ -1,9 +1,8 @@
-# folder, num columns, num rows, num images, x_offset, y_offset
-# 25, 43, 63, 79, 32, 88
-attack,4,6,21,311,186
-attack2,4,8,29,334,171
-death,4,8,29,336,162
-hit,4,7,25,299,139
-idle,4,8,29,339,133
-victory,4,8,29,332,184
-walking,4,7,28,332,129
+# folder, num columns, num rows, num images, x_offset, y_offset, scale
+attack,4,2,6,55,22,1.0
+attack2,4,2,6,264,111,1.0
+death,4,3,10,112,28,1.0
+#hit,4,7,25,299,139
+idle,4,2,8,106,22,1.0
+#victory,4,8,29,332,184
+walk,4,2,8,64,24,1.0
