@@ -32,7 +32,7 @@ class Fighter:
         self.attacking_rect = self.rect
         self.vel_y = 0
         self.running = False
-        self.jump = False
+        # self.jump = False
         self.attacking = False
         self.attack_type = 0
         self.attack_cooldown = 0
@@ -106,9 +106,9 @@ class Fighter:
                     dx = SPEED
                     self.running = True
                 # jump
-                if key[pygame.K_w] and self.jump == False:
-                    self.vel_y = -30
-                    self.jump = True
+                # if key[pygame.K_w] and self.jump == False:
+                #     self.vel_y = -30
+                #     self.jump = True
                 # attack
                 if key[pygame.K_r] or key[pygame.K_t]:
                     self.attack(target)
@@ -128,9 +128,9 @@ class Fighter:
                     dx = SPEED
                     self.running = True
                 # jump
-                if key[pygame.K_UP] and self.jump == False:
-                    self.vel_y = -30
-                    self.jump = True
+                # if key[pygame.K_UP] and self.jump == False:
+                #     self.vel_y = -30
+                #     self.jump = True
                 # attack
                 if key[pygame.K_m] or key[pygame.K_n]:
                     self.attack(target)
@@ -152,7 +152,7 @@ class Fighter:
             dx = screen_width - self.rect.right
         if self.rect.bottom + dy > screen_height - screen_bottom_offset:
             self.vel_y = 0
-            self.jump = False
+            # self.jump = False
             dy = screen_height - screen_bottom_offset - self.rect.bottom
 
         # ensure players face each other
@@ -187,8 +187,8 @@ class Fighter:
                 self.update_action(Actions.ATTACK.value)  # 3:attack1
             elif self.attack_type == 2:
                 self.update_action(Actions.ATTACK2.value)  # 4:attack2
-        elif self.jump:
-            self.update_action(Actions.VICTORY.value)  # 2:jump
+        # elif self.jump:
+        #     self.update_action(Actions.VICTORY.value)  # 2:jump
         elif self.running:
             self.update_action(Actions.WALKING.value)  # 1:run
         else:
