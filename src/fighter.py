@@ -249,6 +249,8 @@ class Fighter:
 
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
+        scale = self.loadedScales[self.action]
+        img = pygame.transform.smoothscale(img, (img.get_width() * scale, img.get_height() * scale))
         if 0 <= self.action < len(self.offset):
             offset = self.offset[self.action]
         else:
