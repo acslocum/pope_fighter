@@ -259,7 +259,7 @@ class Fighter:
         x_off = offset[0]
         if self.flip:
             x_off = img.get_width() - x_off - self.rect.width
-        surface.blit(img, (self.rect.x - (x_off * self.image_scale), self.rect.y - (offset[1] * self.image_scale)))
+        surface.blit(img, (self.rect.x - (x_off * self.image_scale * self.loadedScales[self.action]), self.rect.y - (offset[1] * self.image_scale * self.loadedScales[self.action])))
         if self.debug:
             # draw a circle at sprite center and a hit box
             #print('Drawing indicators')
