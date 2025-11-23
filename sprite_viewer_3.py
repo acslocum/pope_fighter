@@ -104,15 +104,19 @@ if __name__ == "__main__":
     #sprite_size = (spritesheet.get_width() // sprite_layout[0], spritesheet.get_height() // sprite_layout[1])
     #print(f'Sprite sheet dimensions: {spritesheet.get_size()}, image dimensions: {sprite_size}')
 
+    spaceReleased = True
     while running:
         # check for key presses
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE and spaceReleased:
                     sequenceID = (sequenceID + 1) % len(sprites)
                     spriteID = 0
+                    spaceReleased = False
+            elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                spaceReleased = True
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP]:
