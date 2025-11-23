@@ -128,9 +128,9 @@ if __name__ == "__main__":
             if keys[pygame.K_RIGHT]:
                 loaded_offs[sequenceID] = (loaded_offs[sequenceID][0] + 1, loaded_offs[sequenceID][1])
             if keys[pygame.K_EQUALS]:
-                scales[sequenceID] = scales[sequenceID] + 0.1
+                scales[sequenceID] = scales[sequenceID] + 0.01
             if keys[pygame.K_MINUS]:
-                scales[sequenceID] = scales[sequenceID] - 0.1
+                scales[sequenceID] = scales[sequenceID] - 0.01
         
         screen.fill((0,0,0))
         x = 100
