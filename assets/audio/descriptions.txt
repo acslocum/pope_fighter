@@ -1,0 +1,7 @@
+# type (music or sound), folder
+sound, attack
+music, background
+sound, dying
+sound, hit
+sound, intro
+sound, victory
