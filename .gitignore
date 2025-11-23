@@ -23,3 +23,6 @@ Thumbs.db
 .venv/
 
 assets/db/qr_codes/
+
+
+untracked/
