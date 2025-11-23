@@ -8,12 +8,12 @@ class Actions(Enum):
     ATTACK = 0
     ATTACK2 = 1
     DEATH = 2
-    #HIT = 3
-    IDLE = 3
-    #VICTORY = 5
-    WALKING = 4
+    HIT = 3
+    IDLE = 4
+    VICTORY = 5
+    WALKING = 6
 class Fighter:
-    def __init__(self, player, x, y, flip, directory, sound, pope : PopeData = None):
+    def __init__(self, player, x, y, flip, directory, sound : GameSounds, pope : PopeData = None):
         self.player = player
         self.popeData = PopeData
         self.flip = flip
@@ -40,6 +40,7 @@ class Fighter:
         self.hit = False
         self.health = 100
         self.alive = True
+        self.victory = False
 
         self.debug = False
 
@@ -187,8 +188,8 @@ class Fighter:
                 self.update_action(Actions.ATTACK.value)  # 3:attack1
             elif self.attack_type == 2:
                 self.update_action(Actions.ATTACK2.value)  # 4:attack2
-        # elif self.jump:
-        #     self.update_action(Actions.VICTORY.value)  # 2:jump
+        elif self.jump:
+            self.update_action(Actions.VICTORY.value)  # 2:victory
         elif self.running:
             self.update_action(Actions.WALKING.value)  # 1:run
         else:
@@ -213,21 +214,25 @@ class Fighter:
                     self.attacking = False
                     self.attack_cooldown = 20
                 # check if damage was taken
-                # if self.action == Actions.HIT.value:
-                #     self.hit = False
-                #     # if the player was in the middle of an attack, then the attack is stopped
-                #     self.attacking = False
-                #     self.attack_cooldown = 20
+                if self.action == Actions.HIT.value:
+                    self.hit = False
+                    # if the player was in the middle of an attack, then the attack is stopped
+                    self.attacking = False
+                    self.attack_cooldown = 20
 
     def attack(self, target):
         if self.attack_cooldown == 0:
             # execute attack
             self.attacking = True
-            self.attack_sound.play()
+            if self.attack_sound is not None:
+                effect = self.attack_sound.getRandEffect('attack')
+                effect.play()
 
             if self.attacking_rect.colliderect(target.rect):
                 target.health -= 10
                 target.hit = True
+                if target.health <= 0:
+                    self.victory = True
 
     def update_action(self, new_action):
         # check if the new action is different to the previous one
