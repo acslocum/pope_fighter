@@ -1,6 +1,8 @@
+from audio_loader import GameSounds
 from enum import Enum
 import pygame
 import os
+import random
 from sprite_loader import *
 from PopeData import PopeData
 
@@ -36,7 +38,7 @@ class Fighter:
         self.attacking = False
         self.attack_type = 0
         self.attack_cooldown = 0
-        self.attack_sound = sound
+        self.attack_sound : GameSounds = sound
         self.hit = False
         self.health = 100
         self.alive = True
@@ -181,6 +183,9 @@ class Fighter:
             self.health = 0
             self.alive = False
             self.update_action(Actions.DEATH.value)  # 6:death
+            if self.attack_sound is not None:
+                effect = self.attack_sound.getRandEffect('dying')
+                effect.play()
         elif self.hit:
             self.update_action(Actions.HIT.value)  # 5:hit
         elif self.attacking:

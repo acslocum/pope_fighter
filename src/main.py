@@ -8,6 +8,7 @@ import os
 import re
 import requests
 import sys
+from audio_loader import GameSounds
 from fighter import Fighter
 import db_parser
 
@@ -64,13 +65,14 @@ count_font = pygame.font.Font(resource_path(font_name), 80)
 score_font = pygame.font.Font(resource_path(font_name), 30)
 frame_font = pygame.font.SysFont('Arial', 20, bold=True, italic=False)
 # Music and Sounds
-pygame.mixer.music.load(resource_path("assets/audio/music.mp3"))
-pygame.mixer.music.set_volume(0.5)
-pygame.mixer.music.play(-1, 0.0, 5000)
-sword_fx = pygame.mixer.Sound(resource_path("assets/audio/sword.wav"))
-sword_fx.set_volume(0.5)
-magic_fx = pygame.mixer.Sound(resource_path("assets/audio/magic.wav"))
-magic_fx.set_volume(0.75)
+#pygame.mixer.music.load(resource_path("assets/audio/music.mp3"))
+# pygame.mixer.music.set_volume(0.5)
+# pygame.mixer.music.play(-1, 0.0, 5000)
+# sword_fx = pygame.mixer.Sound(resource_path("assets/audio/sword.wav"))
+# sword_fx.set_volume(0.5)
+# magic_fx = pygame.mixer.Sound(resource_path("assets/audio/magic.wav"))
+# magic_fx.set_volume(0.75)
+game_sounds = GameSounds('assets/audio')
 
 # declare pope IDs
 popeServerBaseURL = 'http://localhost:3000/'
@@ -398,8 +400,8 @@ def reset_game():
     global fighter_1, fighter_2
     # fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
     # fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
-    fighter_1 = Fighter(1, 0.1 * SCREEN_WIDTH, 310, False, 'assets/images/pope1', sword_fx, left_pope)
-    fighter_2 = Fighter(2, 0.9 * SCREEN_WIDTH, 310, True, 'assets/images/pope1', magic_fx, right_pope)
+    fighter_1 = Fighter(1, 0.1 * SCREEN_WIDTH, 310, False, 'assets/images/pope1', game_sounds, left_pope)
+    fighter_2 = Fighter(2, 0.9 * SCREEN_WIDTH, 310, True, 'assets/images/pope1', game_sounds, right_pope)
     if game_debug:
         print('Enable debug for fighters')
         fighter_1.debug = True
@@ -428,6 +430,9 @@ def countdown():
         x_pos = (SCREEN_WIDTH - text_width) // 2
 
         draw_text(text, countdown_font, RED, x_pos, SCREEN_HEIGHT // 2 - 50)
+        if text == countdown_texts[-1]:
+            effect = game_sounds.getRandEffect('intro')
+            effect.play()
 
         pygame.display.update()
         pygame.time.delay(1000)
