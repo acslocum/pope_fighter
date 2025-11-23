@@ -139,7 +139,7 @@ if __name__ == "__main__":
         height = 480
         img = sprites[sequenceID][spriteID]
         scale = scales[sequenceID]
-        scaledImg = pygame.transform.scale(img, (img.get_width() * scale, img.get_height() * scale))
+        scaledImg = pygame.transform.smoothscale(img, (img.get_width() * scale, img.get_height() * scale))
         screen.blit(scaledImg, (x - loaded_offs[sequenceID][0], y - loaded_offs[sequenceID][1])) # Blit the sprite at coordinates (100, 100)
         player_rect = pygame.Rect((x, y, width, height))
         pygame.draw.rect(screen, (255,0,0), player_rect, width = 1)
