@@ -85,6 +85,10 @@ popeServerURL = popeServerBaseURL + popeIDEndpoint
 left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
 popeDB = db_parser.getPopes('assets/db/Pope-mon_stats.xlsx')
+#print(f'pope DB size: {len(popeDB)}')
+if game_debug:
+    left_pope = popeDB[1]
+    right_pope = popeDB[2]
 
 # Game Variables
 score = [0, 0]  # Player Scores: [P1, P2]
@@ -556,11 +560,8 @@ def game_loop():
         #draw_bg(bg_image, is_game_started=game_started)
         screen.blit(bg_image, (0,0))
 
-        p1_name = left_pope.name if left_pope is not None else 'P1'
-        p2_name = right_pope.name if right_pope is not None else 'P2'
-        if game_debug:
-            p1_name = 'Pope Testus I'
-            p2_name = 'Pope Beta IV'
+        p1_name = left_pope.name if left_pope is not None else 'Pope Testus I'
+        p2_name = right_pope.name if right_pope is not None else 'Pope Beta IV'
 
         #draw_text(f"P1: {score[0]}", score_font, WHITE, 20, 20)
         #draw_text(f"P2: {score[1]}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
