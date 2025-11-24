@@ -193,7 +193,7 @@ class Fighter:
                 self.update_action(Actions.ATTACK.value)  # 3:attack1
             elif self.attack_type == 2:
                 self.update_action(Actions.ATTACK2.value)  # 4:attack2
-        elif self.jump:
+        elif self.victory:
             self.update_action(Actions.VICTORY.value)  # 2:victory
         elif self.running:
             self.update_action(Actions.WALKING.value)  # 1:run
