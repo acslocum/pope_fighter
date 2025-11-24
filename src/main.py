@@ -60,7 +60,9 @@ warrior_victory_img = pygame.image.load(resource_path("assets/images/warrior.png
 wizard_victory_img = pygame.image.load(resource_path("assets/images/wizard.png")).convert_alpha()
 
 # Fonts
-font_name = 'assets/fonts/Papyrus.ttc'
+#font_name = 'assets/fonts/Papyrus.ttc'
+font_name = 'assets/fonts/Praetoria D.otf'
+#font_name = 'assets/fonts/spqr.ttf'
 menu_font = pygame.font.Font(resource_path(font_name), 50)
 menu_font_title = pygame.font.Font(resource_path(font_name), 100)  # Larger font for title
 count_font = pygame.font.Font(resource_path(font_name), 80)
