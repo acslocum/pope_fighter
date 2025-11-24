@@ -358,6 +358,28 @@ def main_menu():
 
                     # reset for next scan
                     scanned = ''
+                elif scanned.startswith('*'):
+                    print(f'{scanned}')
+                    if re.search(r"\d{3}", scanned) is not None:
+                        strID = scanned[1:]
+                        id = int(strID)
+                        if id in popeDB:
+                            pope = popeDB[id]
+                            print(f'Scanned in pope ID: {id}, {pope.name}, loading from local DB...')
+                            if left_pope is None:
+                                left_pope = pope
+                                left_pope_name = pope.name
+                            elif right_pope is None:
+                                right_pope = pope
+                                right_pope_name = pope.name
+
+                            # check to see if we have two popes
+                            if left_pope and right_pope:
+                                print(f'We\'ve got a match {left_pope.name} vs. {right_pope.name}')
+                                #return "START"
+                    
+                        # reset for next scan
+                        scanned = ''
 
         pygame.display.update()
         clock.tick(FPS)
