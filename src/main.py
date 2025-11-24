@@ -435,14 +435,17 @@ def reset_game():
         fighter_1.debug = True
         fighter_2.debug = True
 
-def draw_health_bar(health, x, y):
+def draw_health_bar(health, x, y, flip = False):
     pygame.draw.rect(screen, BLACK, (x, y, 200, 20))
+    x_off = 0
+    if flip:
+        x_off = 200 - health * 2
     if 0 < health <= 25:
-        pygame.draw.rect(screen, RED, (x, y, health * 2, 20))
+        pygame.draw.rect(screen, RED, (x + x_off, y, health * 2, 20))
     elif 25 < health <= 50:
-        pygame.draw.rect(screen, YELLOW, (x, y, health * 2, 20))
+        pygame.draw.rect(screen, YELLOW, (x + x_off, y, health * 2, 20))
     elif 50 < health <= 100:
-        pygame.draw.rect(screen, GREEN, (x, y, health * 2, 20))
+        pygame.draw.rect(screen, GREEN, (x + x_off, y, health * 2, 20))
     pygame.draw.rect(screen, WHITE, (x, y, 200, 20), 2)
 
 def draw_outline_text(x, y, string, font, col, outline_col, window):
