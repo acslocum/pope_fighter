@@ -31,7 +31,7 @@ class GameSounds:
         
         sounds = self.sounds[category]
         idx = random.randrange(len(sounds))
-        print(f'Randomly selecting index {idx} of {len(sounds)} for category {category}')
+        #print(f'Randomly selecting index {idx} of {len(sounds)} for category {category}')
         return sounds[idx]
 
     def loadSounds(self, directory : str):

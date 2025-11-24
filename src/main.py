@@ -465,7 +465,7 @@ def countdown():
     text = str(val)
     interval_delay = 1000
     font = pygame.font.Font(font_name, size=100)
-    print(f'Font height: {font.get_height()}')
+    # print(f'Font height: {font.get_height()}')
 
     while True:
         screen.blit(bg_image, (0,0))
@@ -475,7 +475,7 @@ def countdown():
 
         if pygame.time.get_ticks() - time > interval_delay:
             val -= 1
-            print(f'{val}, ({x}, {y})')
+            #print(f'{val}, ({x}, {y})')
             if val > 0:
                 text = str(val)
             elif val == 0:

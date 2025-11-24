@@ -201,6 +201,7 @@ class Fighter:
             self.update_action(Actions.IDLE.value)  # 0:idle
 
         animation_cooldown = 50
+            #print(f'Ticks: {pygame.time.get_ticks()}')
         # update image
         self.image = self.animation_list[self.action][self.frame_index]
         # check if enough time has passed since the last update
@@ -242,6 +243,10 @@ class Fighter:
     def update_action(self, new_action):
         # check if the new action is different to the previous one
         if new_action != self.action:
+            # if new_action == Actions.HIT.value:
+            #     print(f'Starting hit action: {pygame.time.get_ticks()}')
+            # elif self.action == Actions.HIT.value:
+            #     print(f'End hit action: {pygame.time.get_ticks()}')
             self.action = new_action
             # update the animation settings
             self.frame_index = 0
