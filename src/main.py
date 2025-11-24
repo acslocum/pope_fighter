@@ -483,6 +483,8 @@ def countdown():
                 text = str(val)
             elif val == 0:
                 text = 'FIGHT!!'
+                effect = game_sounds.getRandEffect('intro')
+                effect.play()
             elif val < 0:
                 return
             time = pygame.time.get_ticks()
