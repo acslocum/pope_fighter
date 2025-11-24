@@ -610,6 +610,7 @@ def game_loop():
 while True:
     if game_debug:
         game_loop()
+        exit()
     else:
         menu_selection = main_menu()
 
