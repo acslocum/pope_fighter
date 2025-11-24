@@ -149,7 +149,7 @@ def aspect_scale(img, tgtSize):
         else:
             sy = by
 
-    return pygame.transform.scale(img, (sx,sy))
+    return pygame.transform.smoothscale(img, (sx,sy))
 
 def victory_screen(winner_img):
     start_time = pygame.time.get_ticks()
