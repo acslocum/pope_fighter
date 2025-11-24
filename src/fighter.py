@@ -17,7 +17,7 @@ class Actions(Enum):
 class Fighter:
     def __init__(self, player, x, y, flip, directory, sound : GameSounds, pope : PopeData = None):
         self.player = player
-        self.popeData = PopeData
+        self.popeData : PopeData = pope 
         self.flip = flip
         self.offset : list[tuple[int]] = []
         self.loadedScales : list[int] = []
