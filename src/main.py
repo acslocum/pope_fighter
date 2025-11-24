@@ -52,7 +52,9 @@ pygame.display.set_caption(game_title)
 clock = pygame.time.Clock()
 
 # Load Assets
-bg_image = cv2.imread(resource_path("assets/images/bg2.jpg"))
+#bg_image = cv2.imread(resource_path("assets/images/bg2.jpg"))
+bg_image = pygame.image.load(resource_path("assets/images/bg2.jpg"))
+bg_image = pygame.transform.smoothscale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 victory_img = pygame.image.load(resource_path("assets/images/victory.png")).convert_alpha()
 warrior_victory_img = pygame.image.load(resource_path("assets/images/warrior.png")).convert_alpha()
 wizard_victory_img = pygame.image.load(resource_path("assets/images/wizard.png")).convert_alpha()
@@ -206,7 +208,8 @@ def main_menu():
         frame_img = None
 
     while True:
-        draw_bg(bg_image, is_game_started=False)
+        #draw_bg(bg_image, is_game_started=False)
+        screen.blit(bg_image, (0,0))
         if frame_img is not None:
             f1_x = SCREEN_WIDTH * 0.1
             f1_y = SCREEN_HEIGHT * 0.2
@@ -362,7 +365,8 @@ def main_menu():
 
 def scores_screen():
     while True:
-        draw_bg(bg_image)
+        #draw_bg(bg_image)
+        screen.blit(bg_image, (0,0))
 
         scores_title = "SCORES"
         draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
@@ -417,26 +421,96 @@ def draw_health_bar(health, x, y):
         pygame.draw.rect(screen, GREEN, (x, y, health * 2, 20))
     pygame.draw.rect(screen, WHITE, (x, y, 200, 20), 2)
 
+def draw_outline_text(x, y, string, font, col, outline_col, window):
+    positions = [(x-2,y-2), (x-2,y+2), (x+2,y-2), (x+2,y+2)]
+    for position in positions:
+        text = font.render(string, True, outline_col)
+        textbox = text.get_rect()
+        textbox.center = position
+        window.blit(text, textbox)
+    
+    # blit center part
+    text = font.render(string, True, col)
+    textbox = text.get_rect()
+    textbox.center = (x,y)
+    window.blit(text, textbox)
 
 def countdown():
-    countdown_font = pygame.font.Font(font_name, 100)
-    countdown_texts = ["3", "2", "1", "FIGHT!"]
+    time = pygame.time.get_ticks()
+    val = 3
+    text = str(val)
+    interval_delay = 1000
+    font = pygame.font.Font(font_name, size=100)
+    print(f'Font height: {font.get_height()}')
 
-    for text in countdown_texts:
-        draw_bg(bg_image, is_game_started=True)
+    while True:
+        screen.blit(bg_image, (0,0))
+        x = int(0.5 * SCREEN_WIDTH)
+        y = int(0.3 * SCREEN_HEIGHT)
+        draw_outline_text(x,y,text, font, (255,255,0), (0,0,0), screen)
 
-        text_img = countdown_font.render(text, True, RED)
-        text_width = text_img.get_width()
-        x_pos = (SCREEN_WIDTH - text_width) // 2
+        if pygame.time.get_ticks() - time > interval_delay:
+            val -= 1
+            print(f'{val}, ({x}, {y})')
+            if val > 0:
+                text = str(val)
+            elif val == 0:
+                text = 'FIGHT!!'
+            elif val < 0:
+                return
+            time = pygame.time.get_ticks()
 
-        draw_text(text, countdown_font, RED, x_pos, SCREEN_HEIGHT // 2 - 50)
-        if text == countdown_texts[-1]:
-            effect = game_sounds.getRandEffect('intro')
-            effect.play()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
 
         pygame.display.update()
-        pygame.time.delay(1000)
+        clock.tick(FPS)
 
+    # countdown_font = pygame.font.Font(font_name, 100)
+    # countdown_texts = ["3", "2", "1", "FIGHT!"]
+    # index = 0
+    # time = pygame.time.get_ticks()
+    # interval_delay = 1000
+    # draw_bg(bg_image, is_game_started=False)
+
+    # while True:
+    #     draw_bg(bg_image, is_game_started=False)
+
+    #     text = countdown_texts[index]
+    #     text_img = countdown_font.render(text, True, RED)
+    #     text_width = text_img.get_width()
+    #     x_pos = (SCREEN_WIDTH - text_width) // 2
+    #     draw_text(text, countdown_font, RED, x_pos, SCREEN_HEIGHT // 2 - 50)
+
+    #     if pygame.time.get_ticks() - time > interval_delay:
+    #         # get next text entry
+    #         print(text)
+    #         #print(f'bg_image: {bg_image.get_width()} x {bg_image.get_height()}')
+    #         time = pygame.time.get_ticks()
+    #         index += 1
+    #         if index == len(countdown_texts):
+    #             effect = game_sounds.getRandEffect('intro')
+    #             effect.play()
+    #             return
+        
+    #     pygame.display.update()
+    #     pygame.display.flip()
+    #     clock.tick(FPS)
+
+
+        #pygame.display.update()
+
+        # for text in countdown_texts:
+        #     print(text)
+        #     draw_bg(bg_image, is_game_started=True)
+
+            
+        #     if text == countdown_texts[-1]:
+                
+
+        #     pygame.time.delay(1000)
 
 def game_loop():
     global score
@@ -450,7 +524,8 @@ def game_loop():
     countdown()
 
     while True:
-        draw_bg(bg_image, is_game_started=game_started)
+        #draw_bg(bg_image, is_game_started=game_started)
+        screen.blit(bg_image, (0,0))
 
         p1_name = left_pope.name if left_pope is not None else 'P1'
         p2_name = right_pope.name if right_pope is not None else 'P2'
