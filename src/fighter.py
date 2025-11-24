@@ -64,6 +64,16 @@ class Fighter:
         self.health = 100 * (1 + (self.holiness - self.averageStat) / 10)
         self.max_health = self.health # hold their max health, so we can draw health bar correctly
         #print(f'Pope {player} initial health: {self.health} / {self.max_health}')
+        #self.print_stats()
+
+    def print_stats(self):
+        name = ''
+        if self.popeData is None:
+            name = 'Player ' + str(self.player)
+        else:
+            name = self.popeData.name
+
+        print(f'{name}: h={self.holiness}, m={self.miracles}, w={self.wisdom}, l={self.legacy}')
 
     def load_images(self, directory) -> list[list[pygame.Surface]]:
         # parse description file and then load sprites from their spritesheets
@@ -242,10 +252,32 @@ class Fighter:
                 effect.play()
 
             if self.attacking_rect.colliderect(target.rect):
-                target.health -= 10
-                target.hit = True
-                if target.health <= 0:
-                    self.victory = True
+                # need to calculate whether hit occurs, and if so
+                # how much dmg is done based on player stats
+                #  - miracles -> defense rating (chance to block dmg)
+                #      default value of 6 -> 30% chance to block, +/- 5% per step off from 6
+                #  - wisdom   -> attack rating (chance to hit)
+                #      default value of 6 -> 70% chance to hit, +/- 5% per step off from 6
+                #  - legacy   -> attack power (amount of dmg done per hit)
+                #       dmg per hit will be +/- 2 of your legacy value (i.e. legacy = 6 can do 4-8 dmg)
+                block_pct = 0.3 + 0.05 * (target.miracles - self.averageStat)
+                block_roll = random.uniform(0.0, 1.0)
+                block = True if block_roll <= block_pct else False
+                print(f'block% {block_pct:.2f}, block roll {block_roll:.4f}, block? {block}')
+                hit_pct = 0.7 + 0.05 * (self.wisdom - self.averageStat)
+                hit_roll = random.uniform(0.0, 1.0)
+                hit = True if hit_roll <= hit_pct else False
+                print(f'hit% {hit_pct:.2f}, hit roll {hit_roll:.4f}, hit? {hit}')
+                dmg_rng = (self.legacy - 2, self.legacy + 2)
+                dmg_roll = random.randrange(dmg_rng[0], dmg_rng[1]+1)
+                if block == False and hit == True:
+                    print(f'Hit! dmg done: {dmg_roll} from {dmg_rng}')
+                    target.health -= dmg_roll
+                    target.hit = True
+                    if target.health <= 0:
+                        self.victory = True
+                else:
+                    print('No hit')
 
     def update_action(self, new_action):
         # check if the new action is different to the previous one
