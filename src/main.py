@@ -56,8 +56,6 @@ clock = pygame.time.Clock()
 bg_image = pygame.image.load(resource_path("assets/images/bg2.jpg"))
 bg_image = pygame.transform.smoothscale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 victory_img = pygame.image.load(resource_path("assets/images/victory.png")).convert_alpha()
-warrior_victory_img = pygame.image.load(resource_path("assets/images/warrior.png")).convert_alpha()
-wizard_victory_img = pygame.image.load(resource_path("assets/images/wizard.png")).convert_alpha()
 
 # Fonts
 #font_name = 'assets/fonts/Papyrus.ttc'
@@ -582,11 +580,11 @@ def game_loop():
             if not fighter_1.alive:
                 score[1] += 1
                 round_over = True
-                winner_img = wizard_victory_img
+                #winner_img = 
             elif not fighter_2.alive:
                 score[0] += 1
                 round_over = True
-                winner_img = warrior_victory_img
+                #winner_img = 
         else:
             victory_screen(winner_img)
             return
