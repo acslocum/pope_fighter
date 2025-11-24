@@ -243,7 +243,7 @@ class Fighter:
                     self.attacking = False
                     self.attack_cooldown = 20
 
-    def attack(self, target):
+    def attack(self, target : 'Fighter'):
         if self.attack_cooldown == 0:
             # execute attack
             self.attacking = True
