@@ -569,7 +569,7 @@ def game_loop():
         fighter_1.draw_health_bar(screen, pygame.Rect(20,50,200,20),False)
         fighter_2.draw_health_bar(screen, pygame.Rect(SCREEN_WIDTH-220,50,200,20), True)
 
-        exit_button = draw_button("MAIN MENU", menu_font, BLACK, YELLOW, SCREEN_WIDTH // 2 - 150, 20, 300, 50)
+        exit_button = draw_button("MaiN MeNu", menu_font, BLACK, YELLOW, SCREEN_WIDTH // 2 - 150, 20, 300, 50)
 
         if not round_over:
             fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, fighter_2, round_over)
