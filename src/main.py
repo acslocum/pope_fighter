@@ -467,7 +467,7 @@ def countdown():
     val = 3
     text = str(val)
     interval_delay = 1000
-    font = pygame.font.Font(font_name, size=100)
+    font = pygame.font.Font(font_name, size=int(0.2*SCREEN_HEIGHT))
     # print(f'Font height: {font.get_height()}')
 
     while True:
