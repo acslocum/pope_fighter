@@ -40,23 +40,30 @@ class Fighter:
         self.attack_cooldown = 0
         self.attack_sound : GameSounds = sound
         self.hit = False
-        self.health = 100
         self.alive = True
         self.victory = False
 
         self.debug = False
 
-        # pope specifc mods
-        self.holiness = 6
-        self.miracles = 6
-        self.wisdom = 6
-        self.legacy = 6
+        # pope specifc mods, we've got 4 and they'll all effect aspects of play:
+        #  - holiness -> maximum health
+        #  - miracles -> defense rating (chance to block dmg)
+        #  - wisdom   -> attack rating (chance to hit)
+        #  - legacy   -> attack power (amount of dmg done per hit)
+        # these stats naturally range from 3-9, but can get bumped to 10 by solving puzzles
+        self.averageStat = 6
+        self.holiness = self.averageStat
+        self.miracles = self.averageStat
+        self.wisdom = self.averageStat
+        self.legacy = self.averageStat
         if pope is not None:
             self.holiness = pope.holiness
             self.miracles = pope.miracles
             self.wisdom = pope.wisdom
             self.legacy = pope.legacy
-        self.step_modifier = 0.05 # amount to apply per step off from default score of 6
+        self.health = 100 * (1 + (self.holiness - self.averageStat) / 10)
+        self.max_health = self.health # hold their max health, so we can draw health bar correctly
+        #print(f'Pope {player} initial health: {self.health} / {self.max_health}')
 
     def load_images(self, directory) -> list[list[pygame.Surface]]:
         # parse description file and then load sprites from their spritesheets
@@ -272,3 +279,29 @@ class Fighter:
             pygame.draw.circle(surface, (255,255,255), center, 5)
             pygame.draw.rect(surface, (255,0,0), self.rect, width = 1)
             pygame.draw.rect(surface, (255,255,0), self.attacking_rect, width = 1)
+
+    def draw_health_bar(self, screen : pygame.Surface, rect : pygame.Rect, flip : bool = False):
+        BLACK = (0,0,0)
+        RED = (255,0,0)
+        YELLOW = (255,255,0)
+        GREEN = (0,255,0)
+        WHITE = (255,255,255)
+        x = rect.x
+        y = rect.y
+        x_off = 0
+        health_pct = self.health / self.max_health
+        health_width = int(rect.width * health_pct) # width in pixels to draw health
+        if flip:
+            x_off = rect.width - health_width
+        #print(f'{x}, {y}, {health_width}, {rect.height}')
+        #print(f'{health_pct}')
+
+        # draw everything
+        pygame.draw.rect(screen, BLACK, rect)
+        if 0 < health_pct <= 0.25:
+            pygame.draw.rect(screen, RED, (x + x_off, y, health_width, rect.height))
+        elif 0.25 < health_pct <= 0.50:
+            pygame.draw.rect(screen, YELLOW, (x + x_off, y, health_width, rect.height))
+        elif 0.50 < health_pct:
+            pygame.draw.rect(screen, GREEN, (x + x_off, y, health_width, rect.height))
+        pygame.draw.rect(screen, WHITE, rect, 2)

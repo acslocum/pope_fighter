@@ -566,8 +566,8 @@ def game_loop():
         #draw_text(f"P2: {score[1]}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
         draw_text(f"{p1_name}", score_font, WHITE, 20, 20)
         draw_text(f"{p2_name}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
-        draw_health_bar(fighter_1.health, 20, 50)
-        draw_health_bar(fighter_2.health, SCREEN_WIDTH - 220, 50, True)
+        fighter_1.draw_health_bar(screen, pygame.Rect(20,50,200,20),False)
+        fighter_2.draw_health_bar(screen, pygame.Rect(SCREEN_WIDTH-220,50,200,20), True)
 
         exit_button = draw_button("MAIN MENU", menu_font, BLACK, YELLOW, SCREEN_WIDTH // 2 - 150, 20, 300, 50)
 
