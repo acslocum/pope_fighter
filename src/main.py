@@ -567,7 +567,7 @@ def game_loop():
         draw_text(f"{p1_name}", score_font, WHITE, 20, 20)
         draw_text(f"{p2_name}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
         draw_health_bar(fighter_1.health, 20, 50)
-        draw_health_bar(fighter_2.health, SCREEN_WIDTH - 220, 50)
+        draw_health_bar(fighter_2.health, SCREEN_WIDTH - 220, 50, True)
 
         exit_button = draw_button("MAIN MENU", menu_font, BLACK, YELLOW, SCREEN_WIDTH // 2 - 150, 20, 300, 50)
 
