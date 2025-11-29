@@ -75,6 +75,8 @@ frame_font = pygame.font.SysFont('Arial', 20, bold=True, italic=False)
 # magic_fx = pygame.mixer.Sound(resource_path("assets/audio/magic.wav"))
 # magic_fx.set_volume(0.75)
 game_sounds = GameSounds('assets/audio')
+pope1_game_sounds = GameSounds('assets/audio/pope1')
+pope2_game_sounds = GameSounds('assets/audio/pope2')
 
 # declare pope IDs
 popeServerBaseURL = 'http://localhost:3000/'
@@ -430,8 +432,8 @@ def reset_game():
     global fighter_1, fighter_2
     # fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
     # fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
-    fighter_1 = Fighter(1, 0.1 * SCREEN_WIDTH, 310, False, 'assets/images/pope1', game_sounds, left_pope)
-    fighter_2 = Fighter(2, 0.9 * SCREEN_WIDTH, 310, True, 'assets/images/pope1', game_sounds, right_pope)
+    fighter_1 = Fighter(1, 0.1 * SCREEN_WIDTH, 310, False, 'assets/images/pope1', pope1_game_sounds, left_pope)
+    fighter_2 = Fighter(2, 0.9 * SCREEN_WIDTH, 310, True, 'assets/images/pope1', pope2_game_sounds, right_pope)
     if game_debug:
         print('Enable debug for fighters')
         fighter_1.debug = True
