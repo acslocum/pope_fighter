@@ -57,4 +57,3 @@ if __name__ == '__main__':
         img_rect.center = screen_center
         screen.blit(img, img_rect)
         pygame.display.update()
-
