@@ -433,7 +433,7 @@ def reset_game():
     # fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
     # fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
     fighter_1 = Fighter(1, 0.1 * SCREEN_WIDTH, 310, False, 'assets/images/pope1', pope1_game_sounds, left_pope)
-    fighter_2 = Fighter(2, 0.9 * SCREEN_WIDTH, 310, True, 'assets/images/pope1', pope2_game_sounds, right_pope)
+    fighter_2 = Fighter(2, 0.9 * SCREEN_WIDTH, 310, True, 'assets/images/pope2', pope2_game_sounds, right_pope)
     if game_debug:
         print('Enable debug for fighters')
         fighter_1.debug = True
