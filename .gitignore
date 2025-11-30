@@ -20,3 +20,9 @@ Thumbs.db
 # Ignore IDE/editor-specific files
 .idea/
 .vscode/
+.venv/
+
+assets/db/qr_codes/
+
+
+untracked/
