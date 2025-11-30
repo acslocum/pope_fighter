@@ -39,6 +39,7 @@ class Fighter:
         self.attack_type = 0
         self.attack_cooldown = 0
         self.attack_sound : GameSounds = sound
+        self.deathSoundPlayed = False
         self.hit = False
         self.alive = True
         self.victory = False
@@ -201,9 +202,10 @@ class Fighter:
             self.health = 0
             self.alive = False
             self.update_action(Actions.DEATH.value)  # 6:death
-            if self.attack_sound is not None:
+            if self.attack_sound is not None and not self.deathSoundPlayed:
                 effect = self.attack_sound.getRandEffect('dying')
                 effect.play()
+                self.deathSoundPlayed = True
         elif self.hit:
             self.update_action(Actions.HIT.value)  # 5:hit
         elif self.attacking:
