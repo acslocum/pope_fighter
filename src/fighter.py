@@ -231,10 +231,12 @@ class Fighter:
         # check if the animation has finished
         if self.frame_index >= len(self.animation_list[self.action]):
             # if the player is dead then end the animation
-            if not self.alive or self.victory:
+            if not self.alive:
                 self.frame_index = len(self.animation_list[self.action]) - 1
                 self.finished = True
             else:
+                if self.victory:
+                    self.finished = True
                 self.frame_index = 0
                 # check if an attack was executed
                 if self.action == Actions.ATTACK.value or self.action == Actions.ATTACK2.value:
