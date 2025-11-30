@@ -220,8 +220,11 @@ class Fighter:
         else:
             self.update_action(Actions.IDLE.value)  # 0:idle
 
-        animation_cooldown = 50
+        if self.action == Actions.HIT.value:
+            animation_cooldown = 5
             #print(f'Ticks: {pygame.time.get_ticks()}')
+        else:
+            animation_cooldown = 75
         # update image
         self.image = self.animation_list[self.action][self.frame_index]
         # check if enough time has passed since the last update
