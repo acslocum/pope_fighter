@@ -593,7 +593,7 @@ def game_loop():
         fighter_1.draw_health_bar(screen, pygame.Rect(20,50,200,20),False)
         fighter_2.draw_health_bar(screen, pygame.Rect(SCREEN_WIDTH-220,50,200,20), True)
 
-        exit_button = draw_button("MaiN MeNu", menu_font, BLACK, YELLOW, SCREEN_WIDTH // 2 - 150, 20, 300, 50)
+        #exit_button = draw_button("MaiN MeNu", menu_font, BLACK, YELLOW, SCREEN_WIDTH // 2 - 150, 20, 300, 50)
 
         if not round_over:
             fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, fighter_2, round_over)
@@ -611,7 +611,13 @@ def game_loop():
             #     round_over = True
                 winner_img = right_pope.image
             if fighter_1.finished and fighter_2.finished:
-                round_over = True
+                #round_over = True
+                button_width = 280
+                button_height = 60
+                exit_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+                                       SCREEN_HEIGHT * 0.75, button_width, button_height)
+
+                pass
         else:
             victory_screen(winner_img)
             return
@@ -632,7 +638,7 @@ def game_loop():
                 pygame.quit()
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if exit_button.collidepoint(event.pos):
+                if exit_button is not None and exit_button.collidepoint(event.pos):
                     return
 
         pygame.display.update()
