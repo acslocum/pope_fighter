@@ -571,6 +571,9 @@ def game_loop():
     round_over = False
     winner_img = None
     game_started = True
+    if game_debug:
+        curr_time = pygame.time.get_ticks()
+        health_delay = 1000
 
     baseline_ypos = 0.8 # % down the screen for the line players stand on
 
@@ -618,7 +621,12 @@ def game_loop():
 
         if game_debug:
             pygame.draw.line(screen, (255,255,0), (0, SCREEN_HEIGHT * baseline_ypos), (SCREEN_WIDTH, SCREEN_HEIGHT * baseline_ypos), width=3)
-
+            if pygame.time.get_ticks() - curr_time > health_delay:
+                curr_time = pygame.time.get_ticks()
+                if fighter_1.health > 0:
+                    fighter_1.health -= 20
+                if fighter_1.health <= 0:
+                    fighter_2.victory = True
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
