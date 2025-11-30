@@ -5,6 +5,7 @@ from pygame import font
 import cv2
 import numpy as np
 import os
+import random
 import re
 import requests
 import sys
@@ -158,6 +159,7 @@ def aspect_scale(img, tgtSize):
     return pygame.transform.smoothscale(img, (sx,sy))
 
 def victory_screen(winner_img):
+    switch_music(None) # stop music for now, might replace with a victory screen
     start_time = pygame.time.get_ticks()
     while pygame.time.get_ticks() - start_time < ROUND_OVER_COOLDOWN:
 
@@ -212,6 +214,8 @@ def main_menu():
     except pygame.error as e:
         print(f"Error loading image: {e}")
         frame_img = None
+
+    switch_music('assets/audio/background/popemon background music1.mp3')
 
     while True:
         #draw_bg(bg_image, is_game_started=False)
@@ -439,6 +443,12 @@ def reset_game():
         fighter_1.debug = True
         fighter_2.debug = True
 
+    # select background music for game
+    background_choices = ['assets/audio/background/popemon background music2.mp3', 'assets/audio/background/popemon background music3.mp3']
+    music_file = background_choices[random.randrange(len(background_choices))]
+    switch_music(music_file, volume=0.3)
+
+
 def draw_health_bar(health, x, y, flip = False):
     pygame.draw.rect(screen, BLACK, (x, y, 200, 20))
     x_off = 0
@@ -465,6 +475,16 @@ def draw_outline_text(x, y, string, font, col, outline_col, window):
     textbox = text.get_rect()
     textbox.center = (x,y)
     window.blit(text, textbox)
+
+def switch_music(filename, fadeout = 1000, volume = 0.5):
+    if pygame.mixer.music.get_busy():
+        #pygame.mixer.music.stop()
+        pygame.mixer.music.fadeout(fadeout)
+
+    if filename is not None:
+        pygame.mixer.music.load(filename)
+        pygame.mixer.music.set_volume(volume)
+        pygame.mixer.music.play(-1) # loop forever
 
 def countdown():
     time = pygame.time.get_ticks()
