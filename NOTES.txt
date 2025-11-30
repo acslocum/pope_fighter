@@ -1,0 +1,50 @@
+INSTALL
+ - There is a requirements.txt file at the top of the folder. The way I  
+   work on my end is:
+
+   - Create a python virtual environment in the Street_Fighter folder
+
+       python -m venv .venv
+
+   - Enter virtual environment
+
+       source .venv/bin/activate
+
+   - Use pip and requirements.txt to install all the python modules we need
+
+       pip install -r requirements.txt
+
+RUNNING
+  - The game is launched via the 'main.py' file in src/
+    
+      python src/main.py
+
+DEBUG mode
+  - Near the top of src/main.py (line 38 as of this writing) is the following line:
+    
+      game_debug = True
+    
+    I'm using that line to shortcut some of the normal game flow as needed to focus
+    on whatever I'm currently working on. At the moment, using that skips the scan-in
+    screen, and automatically assigns popes 001 and 002 as players 1 & 2, respectively.
+    
+    If you comment that line out, then the game will start up showing the scan-in screen
+    and your popes will need to be selected via that screen to get to gameplay
+
+    At the scan-in screen, you can either scan a QR code (assuming you have a QR code
+    scanner), or you can type the Pope ID on the keyboard by typing a '*' and then the
+    three digit pope ID. For example, to get Pope Benedict V (pope #144) you would type
+      *144
+
+    Gameplay key bindings
+      Player 1:
+        a - move left
+        d - move right 
+        r - attack 1
+        t - attack 2 
+
+      Player 2:
+        left arrow  - move left
+        right arrow - move right
+        m - attack 1
+        n - attack 2
