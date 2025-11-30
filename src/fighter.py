@@ -42,6 +42,7 @@ class Fighter:
         self.hit = False
         self.alive = True
         self.victory = False
+        self.finished = False # used to indicate death/victory animation is complete
 
         self.debug = False
 
@@ -228,8 +229,9 @@ class Fighter:
         # check if the animation has finished
         if self.frame_index >= len(self.animation_list[self.action]):
             # if the player is dead then end the animation
-            if not self.alive:
+            if not self.alive or self.victory:
                 self.frame_index = len(self.animation_list[self.action]) - 1
+                self.finished = True
             else:
                 self.frame_index = 0
                 # check if an attack was executed
