@@ -22,7 +22,7 @@ class Fighter:
         self.offset : list[tuple[int]] = []
         self.loadedScales : list[int] = []
         self.animation_list : list[list[pygame.Surface]] = self.load_images(directory)
-        self.image_scale = 1
+        self.image_scale = 2
         self.action = Actions.IDLE.value  # 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
@@ -302,7 +302,7 @@ class Fighter:
 
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
-        scale = self.loadedScales[self.action]
+        scale = self.loadedScales[self.action] * self.image_scale
         img = pygame.transform.smoothscale(img, (img.get_width() * scale, img.get_height() * scale))
         if 0 <= self.action < len(self.offset):
             offset = self.offset[self.action]
@@ -312,6 +312,7 @@ class Fighter:
         x_off = offset[0]
         if self.flip:
             x_off = img.get_width() - x_off * self.loadedScales[self.action] - self.rect.width * self.loadedScales[self.action] 
+            x_off = img.get_width() - x_off * self.loadedScales[self.action] - self.rect.width 
         surface.blit(img, (self.rect.x - (x_off * self.image_scale * self.loadedScales[self.action]), self.rect.y - (offset[1] * self.image_scale * self.loadedScales[self.action])))
         if self.debug:
             # draw a circle at sprite center and a hit box
