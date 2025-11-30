@@ -600,13 +600,15 @@ def game_loop():
             fighter_2.update()
 
             if not fighter_1.alive:
-                score[1] += 1
-                round_over = True
-                #winner_img = 
+            #     score[1] += 1
+            #     round_over = True
+                winner_img = left_pope.image 
             elif not fighter_2.alive:
-                score[0] += 1
+            #     score[0] += 1
+            #     round_over = True
+                winner_img = right_pope.image
+            if fighter_1.finished and fighter_2.finished:
                 round_over = True
-                #winner_img = 
         else:
             victory_screen(winner_img)
             return
