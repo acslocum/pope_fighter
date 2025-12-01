@@ -83,6 +83,9 @@ pope2_game_sounds = GameSounds('assets/audio/pope2')
 popeServerBaseURL = 'http://localhost:3000/' # https://yjjgz5xvun.us-east-2.awsapprunner.com/
 popeIDEndpoint = 'pope_json/'
 popeServerURL = popeServerBaseURL + popeIDEndpoint
+popeWinEndpoint = popeServerBaseURL + 'win/' #+popeid
+popeLoseEndpoint = popeServerBaseURL + 'lose/' #+popeid
+
 left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
 popeDB = db_parser.getPopes('assets/db/Pope-mon_stats.xlsx')
@@ -521,6 +524,11 @@ def countdown():
         pygame.display.update()
         clock.tick(FPS)
 
+def record_result(winner, loser):
+    #requests.get(popeWinEndpoint + winner.id, timeout=0.5)
+    #requests.get(popeLoseEndpoint + loser.id, timeout=0.5)
+    return
+
     # countdown_font = pygame.font.Font(font_name, 100)
     # countdown_texts = ["3", "2", "1", "FIGHT!"]
     # index = 0
@@ -606,10 +614,12 @@ def game_loop():
             #     score[1] += 1
             #     round_over = True
                 winner_img = left_pope.image 
+                record_result(left_pope, right_pope)
             elif not fighter_2.alive:
             #     score[0] += 1
             #     round_over = True
                 winner_img = right_pope.image
+                record_result(right_pope, left_pope)
             if fighter_1.finished and fighter_2.finished:
                 #round_over = True
                 button_width = 280
