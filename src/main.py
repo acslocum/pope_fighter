@@ -81,7 +81,7 @@ pope2_game_sounds = GameSounds('assets/audio/pope2')
 
 # declare pope IDs
 popeServerBaseURL = 'http://localhost:3000/'
-popeIDEndpoint = 'pope/'
+popeIDEndpoint = 'pope_json/'
 popeServerURL = popeServerBaseURL + popeIDEndpoint
 left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
