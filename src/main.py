@@ -24,13 +24,14 @@ def resource_path(relative_path):
 
 mixer.init()
 pygame.init()
+pygame.joystick.init()
 
 # Constants
 info = pygame.display.Info()
 SCREEN_WIDTH = info.current_w
 SCREEN_HEIGHT = info.current_h
-SCREEN_WIDTH = 1778
-SCREEN_HEIGHT = 1000
+#SCREEN_WIDTH = 1778
+#SCREEN_HEIGHT = 1000
 FPS = 60
 ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
@@ -88,6 +89,9 @@ popeLoseEndpoint = popeServerBaseURL + 'lose/' #+popeid
 
 left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
+left_joystick : pygame.joystick.Joystick = None
+right_joystick : pygame.joystick.Joystick = None
+
 popeDB = db_parser.getPopes('assets/db/Pope-mon_stats.xlsx')
 #print(f'pope DB size: {len(popeDB)}')
 if game_debug:
@@ -573,6 +577,90 @@ def record_result(winner, loser):
 
         #     pygame.time.delay(1000)
 
+def configure_joysticks():
+    num_joysticks = 1 # number needed to proceed
+    joysticks = {}
+    global left_joystick
+    global right_joystick
+    START_BUTTON = 6
+
+    # wait for required number of joysticks to be plugged in
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                exit()
+            # Handle joystick connection
+            elif event.type == pygame.JOYDEVICEADDED:
+                # Get the device index from the event
+                device_index = event.device_index
+                # Create a Joystick object and store it
+                joystick = pygame.joystick.Joystick(device_index)
+                joystick.init()
+                joysticks[device_index] = joystick
+                print(f"Joystick '{joystick.get_name()}' connected (Device Index: {device_index})")
+                if len(joysticks) == num_joysticks:
+                    running = False
+
+            # Handle joystick disconnection
+            elif event.type == pygame.JOYDEVICEREMOVED:
+                # Get the device index from the event
+                device_index = event.device_index
+                # Remove the joystick from your active list
+                if device_index in joysticks:
+                    del joysticks[device_index]
+                    print(f"Joystick disconnected (Device Index: {device_index})")
+
+        # Fill the screen with a color (e.g., blue)
+        screen.fill(WHITE) 
+
+        if len(joysticks) < num_joysticks:
+            text = f'Plug in {num_joysticks - len(joysticks)} joystick(s)'
+            text = text.upper()
+            text_img = menu_font.render(text, True, (0,0,0))
+            textbox = text_img.get_rect()
+            textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+            screen.blit(text_img, textbox)
+
+        # Update the display to show the changes
+        pygame.display.flip()
+
+    # wait for required number of joysticks to be plugged in
+    running = True
+    while running:
+        # Fill the screen with a color (e.g., blue)
+        screen.fill(WHITE) 
+
+        if len(joysticks) < num_joysticks:
+            text = 'This should never happen'
+        else:
+            text = 'Press the START button on left joystick'
+
+        text = text.upper()
+        text_img = menu_font.render(text, True, (0,0,0))
+        textbox = text_img.get_rect()
+        textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+        screen.blit(text_img, textbox)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                exit()
+            elif event.type == pygame.JOYBUTTONDOWN:
+                if event.button == START_BUTTON:
+                    print(f'Start button pressed on joystick {event.joy}')
+                    left_joystick = joysticks[event.joy]
+                    del joysticks[event.joy]
+                    if len(joysticks) > 0:
+                        right_joystick = joysticks[joysticks.keys()[0]]
+                    running = False
+                else:
+                    print(f"Joystick {event.joy}: Button {event.button} pressed")
+
+        # Update the display to show the changes
+        pygame.display.flip()
+
 def game_loop():
     global score
     reset_game()
@@ -580,6 +668,9 @@ def game_loop():
     winner_img = None
     game_started = True
     if game_debug:
+        print('In game_loop():')
+        print('  left joystick: ' + str(left_joystick))
+        print('  right joystick: ' + str(right_joystick))
         curr_time = pygame.time.get_ticks()
         health_delay = 1000
 
@@ -655,6 +746,7 @@ def game_loop():
         clock.tick(FPS)
 
 
+configure_joysticks()
 while True:
     if game_debug:
         game_loop()
