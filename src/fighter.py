@@ -192,8 +192,9 @@ class Fighter:
         self.rect.y += dy
 
         # update attack rect
-        self.attacking_rect = pygame.Rect(self.rect.centerx - (2 * self.rect.width * self.flip), self.rect.y,
-                                2 * self.rect.width, self.rect.height)
+        attack_ratio = 1.5 # ratio of attack radius to fighter width
+        self.attacking_rect = pygame.Rect(self.rect.centerx - int(attack_ratio * self.rect.width * self.flip), self.rect.y,
+                                int(attack_ratio * self.rect.width), self.rect.height)
 
     # handle animation updates
     def update(self):
