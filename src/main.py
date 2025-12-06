@@ -670,8 +670,8 @@ def game_loop():
     game_started = True
     if game_debug:
         print('In game_loop():')
-        print('  left joystick: ' + str(left_joystick))
-        print('  right joystick: ' + str(right_joystick))
+        print('  left joystick present  : ' + str(left_joystick is not None))
+        print('  right joystick present : ' + str(right_joystick is not None))
         curr_time = pygame.time.get_ticks()
         health_delay = 1000
 
