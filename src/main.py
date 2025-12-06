@@ -582,7 +582,7 @@ def configure_joysticks():
     joysticks = {}
     global left_joystick
     global right_joystick
-    START_BUTTON = 6
+    START_BUTTON = 9
 
     # wait for required number of joysticks to be plugged in
     running = True
@@ -600,6 +600,8 @@ def configure_joysticks():
                 joystick.init()
                 joysticks[device_index] = joystick
                 print(f"Joystick '{joystick.get_name()}' connected (Device Index: {device_index})")
+                print(f'# of axes: {joystick.get_numaxes()}')
+                print(f'# of buttons: {joystick.get_numbuttons()}')
                 if len(joysticks) == num_joysticks:
                     running = False
 

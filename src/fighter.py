@@ -114,10 +114,12 @@ class Fighter:
         dy = 0
         self.running = False
         self.attack_type = 0
-        BUTTON_RIGHT = 14
-        BUTTON_LEFT = 13
-        BUTTON_Y = 2
-        BUTTON_X = 3
+        # RII gamepads: left & right show up as axis 0
+        # BUTTON_RIGHT = 0
+        # BUTTON_LEFT = 8
+        AXIS = 0
+        BUTTON_Y = 3
+        BUTTON_X = 0
 
         # get keypresses
         key = pygame.key.get_pressed()
@@ -127,10 +129,10 @@ class Fighter:
             # check player 1 controls
             if self.player == 1:
                 # movement
-                if key[pygame.K_a] or (self.joystick and self.joystick.get_button(BUTTON_LEFT)):
+                if key[pygame.K_a] or (self.joystick and self.joystick.get_axis(AXIS) < -0.5):
                     dx = -SPEED
                     self.running = True
-                if key[pygame.K_d] or (self.joystick and self.joystick.get_button(BUTTON_RIGHT)):
+                if key[pygame.K_d] or (self.joystick and self.joystick.get_axis(AXIS) > 0.5):
                     dx = SPEED
                     self.running = True
                 # jump
@@ -149,10 +151,10 @@ class Fighter:
             # check player 2 controls
             if self.player == 2:
                 # movement
-                if key[pygame.K_LEFT] or (self.joystick and self.joystick.get_button(BUTTON_LEFT)):
+                if key[pygame.K_LEFT] or (self.joystick and self.joystick.get_axis(AXIS) < -0.5):
                     dx = -SPEED
                     self.running = True
-                if key[pygame.K_RIGHT] or (self.joystick and self.joystick.get_button(BUTTON_RIGHT)):
+                if key[pygame.K_RIGHT] or (self.joystick and self.joystick.get_axis(AXIS) > 0.5):
                     dx = SPEED
                     self.running = True
                 # jump
