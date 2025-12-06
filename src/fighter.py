@@ -15,22 +15,23 @@ class Actions(Enum):
     VICTORY = 5
     WALKING = 6
 class Fighter:
-    def __init__(self, player, x, y, flip, directory, sound : GameSounds, pope : PopeData = None):
+    def __init__(self, player, x, y, height, flip, directory, sound : GameSounds, pope : PopeData = None):
         self.player = player
         self.popeData : PopeData = pope 
         self.flip = flip
         self.offset : list[tuple[int]] = []
         self.loadedScales : list[int] = []
         self.animation_list : list[list[pygame.Surface]] = self.load_images(directory)
-        self.image_scale = 2
-        self.action = Actions.IDLE.value  # 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
+        self.action = Actions.IDLE.value
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.size = self.image.get_height() # probably should change to actual size, or fix spritesheets so sprites are square
+        self.image_scale = height / self.size
+        print(f'Player {self.player}\'s height: {self.size}, requested height: {height}, scale: {self.image_scale}')
         self.update_time = pygame.time.get_ticks()
         self.rect = pygame.Rect((x, y, int(240 * self.image_scale * self.loadedScales[self.action]), int(480 * self.image_scale) * self.loadedScales[self.action]))
         if self.flip:
-            self.rect.x = self.rect.x - 240 * self.image_scale
+            self.rect.x = self.rect.x - int(240 * self.image_scale)
         self.attacking_rect = self.rect
         self.vel_y = 0
         self.running = False
@@ -317,7 +318,7 @@ class Fighter:
         if self.flip:
             x_off = img.get_width() - x_off * self.loadedScales[self.action] - self.rect.width * self.loadedScales[self.action] 
             x_off = img.get_width() - x_off * self.loadedScales[self.action] - self.rect.width 
-        surface.blit(img, (self.rect.x - (x_off * self.image_scale * self.loadedScales[self.action]), self.rect.y - (offset[1] * self.image_scale * self.loadedScales[self.action])))
+        surface.blit(img, (self.rect.x - int(x_off * self.image_scale * self.loadedScales[self.action]), self.rect.y - int(offset[1] * self.image_scale * self.loadedScales[self.action])))
         if self.debug:
             # draw a circle at sprite center and a hit box
             #print('Drawing indicators')
