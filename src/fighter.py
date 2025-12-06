@@ -15,10 +15,11 @@ class Actions(Enum):
     VICTORY = 5
     WALKING = 6
 class Fighter:
-    def __init__(self, player, x, y, height, flip, directory, sound : GameSounds, pope : PopeData = None):
+    def __init__(self, player, x, y, height, flip, directory, sound : GameSounds, pope : PopeData = None, joystick = None):
         self.player = player
         self.popeData : PopeData = pope 
         self.flip = flip
+        self.joystick : pygame.joystick.Joystick = joystick
         self.offset : list[tuple[int]] = []
         self.loadedScales : list[int] = []
         self.animation_list : list[list[pygame.Surface]] = self.load_images(directory)
@@ -113,6 +114,10 @@ class Fighter:
         dy = 0
         self.running = False
         self.attack_type = 0
+        BUTTON_RIGHT = 14
+        BUTTON_LEFT = 13
+        BUTTON_Y = 2
+        BUTTON_X = 3
 
         # get keypresses
         key = pygame.key.get_pressed()
@@ -122,10 +127,10 @@ class Fighter:
             # check player 1 controls
             if self.player == 1:
                 # movement
-                if key[pygame.K_a]:
+                if key[pygame.K_a] or (self.joystick and self.joystick.get_button(BUTTON_LEFT)):
                     dx = -SPEED
                     self.running = True
-                if key[pygame.K_d]:
+                if key[pygame.K_d] or (self.joystick and self.joystick.get_button(BUTTON_RIGHT)):
                     dx = SPEED
                     self.running = True
                 # jump
@@ -133,21 +138,21 @@ class Fighter:
                 #     self.vel_y = -30
                 #     self.jump = True
                 # attack
-                if key[pygame.K_r] or key[pygame.K_t]:
+                if key[pygame.K_r] or key[pygame.K_t] or (self.joystick and self.joystick.get_button(BUTTON_X)) or (self.joystick and self.joystick.get_button(BUTTON_Y)):
                     self.attack(target)
                     # determine which attack type was used
-                    if key[pygame.K_r]:
+                    if key[pygame.K_r] or (self.joystick and self.joystick.get_button(BUTTON_Y)):
                         self.attack_type = 1
-                    if key[pygame.K_t]:
+                    if key[pygame.K_t] or (self.joystick and self.joystick.get_button(BUTTON_X)):
                         self.attack_type = 2
 
             # check player 2 controls
             if self.player == 2:
                 # movement
-                if key[pygame.K_LEFT]:
+                if key[pygame.K_LEFT] or (self.joystick and self.joystick.get_button(BUTTON_LEFT)):
                     dx = -SPEED
                     self.running = True
-                if key[pygame.K_RIGHT]:
+                if key[pygame.K_RIGHT] or (self.joystick and self.joystick.get_button(BUTTON_RIGHT)):
                     dx = SPEED
                     self.running = True
                 # jump
@@ -155,12 +160,12 @@ class Fighter:
                 #     self.vel_y = -30
                 #     self.jump = True
                 # attack
-                if key[pygame.K_m] or key[pygame.K_n]:
+                if key[pygame.K_m] or key[pygame.K_n] or (self.joystick and self.joystick.get_button(BUTTON_X)) or (self.joystick and self.joystick.get_button(BUTTON_Y)):
                     self.attack(target)
                     # determine which attack type was used
-                    if key[pygame.K_m]:
+                    if key[pygame.K_m] or (self.joystick and self.joystick.get_button(BUTTON_Y)):
                         self.attack_type = 1
-                    if key[pygame.K_n]:
+                    if key[pygame.K_n] or (self.joystick and self.joystick.get_button(BUTTON_X)):
                         self.attack_type = 2
 
         # apply gravity
