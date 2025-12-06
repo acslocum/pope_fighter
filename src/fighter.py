@@ -276,24 +276,25 @@ class Fighter:
                 block_pct = 0.3 + 0.05 * (target.miracles - self.averageStat)
                 block_roll = random.uniform(0.0, 1.0)
                 block = True if block_roll <= block_pct else False
-                print(f'block% {block_pct:.2f}, block roll {block_roll:.4f}, block? {block}')
+                #print(f'block% {block_pct:.2f}, block roll {block_roll:.4f}, block? {block}')
                 crit_multiplier = 2 # amount to multiply dmg roll by if player crits
                 crit_pct = 0.3 + 0.05 * (self.wisdom - self.averageStat)
                 crit_roll = random.uniform(0.0, 1.0)
                 crit = True if crit_roll <= crit_pct else False
-                print(f'crit% {crit_pct:.2f}, crit roll {crit_roll:.4f}, crit? {crit}')
+                #print(f'crit% {crit_pct:.2f}, crit roll {crit_roll:.4f}, crit? {crit}')
                 dmg_rng = (self.legacy - 2, self.legacy + 2)
                 dmg = random.randrange(dmg_rng[0], dmg_rng[1]+1)
                 if crit:
                     dmg *= crit_multiplier
                 if block == False:
-                    print(f'Hit! dmg done: {dmg} from {dmg_rng}')
+                    #print(f'Hit! dmg done: {dmg} from {dmg_rng}')
                     target.health -= dmg
                     target.hit = True
                     if target.health <= 0:
                         self.victory = True
                 else:
-                    print('No hit')
+                    #print('No hit')
+                    pass
 
     def update_action(self, new_action):
         # check if the new action is different to the previous one
