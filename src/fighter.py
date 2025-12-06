@@ -206,7 +206,8 @@ class Fighter:
             self.update_action(Actions.DEATH.value)  # 6:death
             if self.attack_sound is not None and not self.deathSoundPlayed:
                 effect = self.attack_sound.getRandEffect('dying')
-                effect.play()
+                if effect is not None:
+                    effect.play()
                 self.deathSoundPlayed = True
         elif self.hit:
             self.update_action(Actions.HIT.value)  # 5:hit
@@ -260,7 +261,8 @@ class Fighter:
             self.attacking = True
             if self.attack_sound is not None:
                 effect = self.attack_sound.getRandEffect('attack')
-                effect.play()
+                if effect is not None:
+                    effect.play()
 
             if self.attacking_rect.colliderect(target.rect):
                 # need to calculate whether hit occurs, and if so
