@@ -50,7 +50,7 @@ class Fighter:
         # pope specifc mods, we've got 4 and they'll all effect aspects of play:
         #  - holiness -> maximum health
         #  - miracles -> defense rating (chance to block dmg)
-        #  - wisdom   -> attack rating (chance to hit)
+        #  - wisdom   -> crit rating (chance to crit)
         #  - legacy   -> attack power (amount of dmg done per hit)
         # these stats naturally range from 3-9, but can get bumped to 10 by solving puzzles
         self.averageStat = 6
@@ -265,23 +265,26 @@ class Fighter:
                 # how much dmg is done based on player stats
                 #  - miracles -> defense rating (chance to block dmg)
                 #      default value of 6 -> 30% chance to block, +/- 5% per step off from 6
-                #  - wisdom   -> attack rating (chance to hit)
-                #      default value of 6 -> 70% chance to hit, +/- 5% per step off from 6
+                #  - wisdom   -> crit rating (chance to crit)
+                #      default value of 6 -> 30% chance to crit, +/- 5% per step off from 6
                 #  - legacy   -> attack power (amount of dmg done per hit)
                 #       dmg per hit will be +/- 2 of your legacy value (i.e. legacy = 6 can do 4-8 dmg)
                 block_pct = 0.3 + 0.05 * (target.miracles - self.averageStat)
                 block_roll = random.uniform(0.0, 1.0)
                 block = True if block_roll <= block_pct else False
                 print(f'block% {block_pct:.2f}, block roll {block_roll:.4f}, block? {block}')
-                hit_pct = 0.7 + 0.05 * (self.wisdom - self.averageStat)
-                hit_roll = random.uniform(0.0, 1.0)
-                hit = True if hit_roll <= hit_pct else False
-                print(f'hit% {hit_pct:.2f}, hit roll {hit_roll:.4f}, hit? {hit}')
+                crit_multiplier = 2 # amount to multiply dmg roll by if player crits
+                crit_pct = 0.3 + 0.05 * (self.wisdom - self.averageStat)
+                crit_roll = random.uniform(0.0, 1.0)
+                crit = True if crit_roll <= crit_pct else False
+                print(f'crit% {crit_pct:.2f}, crit roll {crit_roll:.4f}, crit? {crit}')
                 dmg_rng = (self.legacy - 2, self.legacy + 2)
-                dmg_roll = random.randrange(dmg_rng[0], dmg_rng[1]+1)
-                if block == False and hit == True:
-                    print(f'Hit! dmg done: {dmg_roll} from {dmg_rng}')
-                    target.health -= dmg_roll
+                dmg = random.randrange(dmg_rng[0], dmg_rng[1]+1)
+                if crit:
+                    dmg *= crit_multiplier
+                if block == False:
+                    print(f'Hit! dmg done: {dmg} from {dmg_rng}')
+                    target.health -= dmg
                     target.hit = True
                     if target.health <= 0:
                         self.victory = True
