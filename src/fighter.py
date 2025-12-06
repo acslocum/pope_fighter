@@ -231,7 +231,7 @@ class Fighter:
             self.update_action(Actions.IDLE.value)  # 0:idle
 
         if self.action == Actions.HIT.value:
-            animation_cooldown = 5
+            animation_cooldown = 45
             #print(f'Ticks: {pygame.time.get_ticks()}')
         else:
             animation_cooldown = 75
