@@ -85,8 +85,9 @@ popeServerBaseURL = 'http://localhost:8080/' # local testing
 # popeServerBaseURL = 'https://yjjgz5xvun.us-east-2.awsapprunner.com/' # real deal
 popeIDEndpoint = 'pope_json/'
 popeServerURL = popeServerBaseURL + popeIDEndpoint
-popeWinEndpoint = popeServerBaseURL + 'win/' #+popeid
-popeLoseEndpoint = popeServerBaseURL + 'lose/' #+popeid
+popeWinEndpoint = popeServerBaseURL + 'win/' # add 'popeid'
+popeLoseEndpoint = popeServerBaseURL + 'lose/' # add 'popeid'
+gameOverEndpoint = popeServerBaseURL + 'game/' # add 'winnerID/loserID'
 
 left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
@@ -530,6 +531,15 @@ def countdown():
         clock.tick(FPS)
 
 def record_result(winner, loser):
+    if type(winner) == int:
+        winner = f'{winner:03d}'
+    if type(loser) == int:
+        loser = f'{loser:03d}'
+    
+    endpoint = f'{gameOverEndpoint}{winner}/{loser}'
+    print(f'Sending end game: {endpoint}')
+    response = requests.get(endpoint, timeout=0.5)
+    print(f'{response}')
     #requests.get(popeWinEndpoint + winner.id, timeout=0.5)
     #requests.get(popeLoseEndpoint + loser.id, timeout=0.5)
     return
@@ -684,6 +694,8 @@ def game_loop():
     baseline_ypos = 0.8 # % down the screen for the line players stand on
 
     countdown()
+    winnerID : int = None
+    loserID : int = None
 
     while True:
         #draw_bg(bg_image, is_game_started=game_started)
@@ -712,12 +724,14 @@ def game_loop():
             #     score[1] += 1
             #     round_over = True
                 winner_img = left_pope.image 
-                record_result(left_pope, right_pope)
+                winnerID = left_pope.id
+                loserID = right_pope.id
             elif not fighter_2.alive:
             #     score[0] += 1
             #     round_over = True
                 winner_img = right_pope.image
-                record_result(right_pope, left_pope)
+                winnerID = right_pope.id
+                loserID = left_pope.id
             if fighter_1.finished and fighter_2.finished:
                 #round_over = True
                 button_width = 280
@@ -756,12 +770,15 @@ def game_loop():
 configure_joysticks()
 while True:
     if game_debug:
-        game_loop()
+        winner, loser = game_loop()
+        record_result(winner, loser)
+
         exit()
     else:
         menu_selection = main_menu()
 
         if menu_selection == "START":
-            game_loop()
+            winner, loser = game_loop()
+            record_result(winner, loser)
         elif menu_selection == "SCORES":
             scores_screen()
