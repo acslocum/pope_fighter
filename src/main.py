@@ -578,7 +578,7 @@ def record_result(winner, loser):
         #     pygame.time.delay(1000)
 
 def configure_joysticks():
-    num_joysticks = 1 # number needed to proceed
+    num_joysticks = 2 # number needed to proceed
     joysticks = {}
     global left_joystick
     global right_joystick
@@ -618,7 +618,11 @@ def configure_joysticks():
         screen.fill(WHITE) 
 
         if len(joysticks) < num_joysticks:
-            text = f'Plug in {num_joysticks - len(joysticks)} joystick(s)'
+            if (num_joysticks - len(joysticks)) > 1:
+                j_str = 'joysticks'
+            else:
+                j_str = 'joystick'
+            text = f'Plug in {num_joysticks - len(joysticks)} {j_str}'
             text = text.upper()
             text_img = menu_font.render(text, True, (0,0,0))
             textbox = text_img.get_rect()
@@ -655,7 +659,7 @@ def configure_joysticks():
                     left_joystick = joysticks[event.joy]
                     del joysticks[event.joy]
                     if len(joysticks) > 0:
-                        right_joystick = joysticks[joysticks.keys()[0]]
+                        right_joystick = joysticks[next(iter(joysticks))]
                     running = False
                 else:
                     print(f"Joystick {event.joy}: Button {event.button} pressed")
@@ -671,8 +675,8 @@ def game_loop():
     game_started = True
     if game_debug:
         print('In game_loop():')
-        print('  left joystick present  : ' + str(left_joystick is not None))
-        print('  right joystick present : ' + str(right_joystick is not None))
+        print(f'  left joystick present  : {str(left_joystick is not None)} {str(left_joystick)}')
+        print(f'  right joystick present : {str(right_joystick is not None)} {str(right_joystick)}')
         curr_time = pygame.time.get_ticks()
         health_delay = 1000
 
