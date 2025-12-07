@@ -27,8 +27,11 @@ class Fighter:
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.size = self.image.get_height() # probably should change to actual size, or fix spritesheets so sprites are square
-        self.image_scale = height / self.size
-        print(f'Player {self.player}\'s height: {self.size}, requested height: {height}, scale: {self.image_scale}')
+        #self.image_scale = height / self.size
+        #print(f'Player {self.player}\'s height: {self.size}, requested height: {height}, scale: {self.image_scale}')
+        self.image_scale = 1
+        if height > 1500:
+            self.image_scale = 2
         self.update_time = pygame.time.get_ticks()
         self.rect = pygame.Rect((x, y, int(240 * self.image_scale * self.loadedScales[self.action]), int(480 * self.image_scale) * self.loadedScales[self.action]))
         if self.flip:
