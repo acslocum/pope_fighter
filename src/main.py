@@ -12,6 +12,7 @@ import sys
 from audio_loader import GameSounds
 from fighter import Fighter
 import db_parser
+from PopeData import PopeData
 
 # Helper Function for Bundled Assets
 def resource_path(relative_path):
@@ -111,6 +112,29 @@ def draw_text(text, font, color, x, y):
 def gen_text_img(text, font, color):
     img = font.render(text, True, color)
     return img
+
+def render_outlined_text(text, font, text_color, outline_color, outline_width):
+    # Render the outline text
+    outline_surface = font.render(text, True, outline_color)
+    
+    # Create a larger surface for the combined text and outline
+    width = outline_surface.get_width() + 2 * outline_width
+    height = outline_surface.get_height() + 2 * outline_width
+    combined_surface = pygame.Surface((width, height), pygame.SRCALPHA) # SRCALPHA for transparency
+
+    # Blit the outline multiple times
+    for x_offset in range(-outline_width, outline_width + 1):
+        for y_offset in range(-outline_width, outline_width + 1):
+            if x_offset != 0 or y_offset != 0: # Avoid blitting directly on top of itself
+                combined_surface.blit(outline_surface, (x_offset + outline_width, y_offset + outline_width))
+
+    # Render the main text
+    main_text_surface = font.render(text, True, text_color)
+    
+    # Blit the main text in the center
+    combined_surface.blit(main_text_surface, (outline_width, outline_width))
+    
+    return combined_surface
 
 def blur_bg(image):
     image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -531,62 +555,123 @@ def countdown():
         clock.tick(FPS)
 
 def record_result(winner, loser):
+    winningPope = None
+    losingPope = None
+    START_BUTTON = 9
     if type(winner) == int:
+        winningPope = popeDB[winner]
         winner = f'{winner:03d}'
     if type(loser) == int:
+        losingPope = popeDB[loser]
         loser = f'{loser:03d}'
     
+    if winningPope is None or losingPope is None:
+        print(f'record_result() error {winner}, {loser}')
+        return
+
     endpoint = f'{gameOverEndpoint}{winner}/{loser}'
     print(f'Sending end game: {endpoint}')
     response = requests.get(endpoint, timeout=0.5)
-    print(f'{response}')
-    #requests.get(popeWinEndpoint + winner.id, timeout=0.5)
-    #requests.get(popeLoseEndpoint + loser.id, timeout=0.5)
-    return
+    data = response.json()
+    print(f'{len(data)}')
 
-    # countdown_font = pygame.font.Font(font_name, 100)
-    # countdown_texts = ["3", "2", "1", "FIGHT!"]
-    # index = 0
-    # time = pygame.time.get_ticks()
-    # interval_delay = 1000
-    # draw_bg(bg_image, is_game_started=False)
+    for d in data:
+        id : int = int(d['ID'])
+        wins : int = int(d['wins'])
+        losses : int = int(d['losses'])
+        popeDB[id].wins = wins
+        popeDB[id].losses = losses
 
-    # while True:
-    #     draw_bg(bg_image, is_game_started=False)
+    # print(winningPope.recordString())
+    # print(losingPope.recordString())
 
-    #     text = countdown_texts[index]
-    #     text_img = countdown_font.render(text, True, RED)
-    #     text_width = text_img.get_width()
-    #     x_pos = (SCREEN_WIDTH - text_width) // 2
-    #     draw_text(text, countdown_font, RED, x_pos, SCREEN_HEIGHT // 2 - 50)
+    frame_file = 'assets/images/frame.png'
+    frame_offset = 98 # number of pixels in x & y in original scale that image portions starts
+    frame_height_percent = 0.6 # % of screen height frame's height should occupy
+    shadow_offset = 5
+    try:
+        frame_img = pygame.image.load(frame_file).convert_alpha()
+        scale_factor = SCREEN_HEIGHT * frame_height_percent / frame_img.get_height()
+        scaled_size = (frame_img.get_width() * scale_factor, frame_img.get_height() * scale_factor)
+        frame_img = pygame.transform.smoothscale(frame_img, scaled_size)
+        frame_offset = frame_offset * scale_factor
+        img_size = (scaled_size[0] - 2 * frame_offset, scaled_size[1] - 2 * frame_offset)
 
-    #     if pygame.time.get_ticks() - time > interval_delay:
-    #         # get next text entry
-    #         print(text)
-    #         #print(f'bg_image: {bg_image.get_width()} x {bg_image.get_height()}')
-    #         time = pygame.time.get_ticks()
-    #         index += 1
-    #         if index == len(countdown_texts):
-    #             effect = game_sounds.getRandEffect('intro')
-    #             effect.play()
-    #             return
-        
-    #     pygame.display.update()
-    #     pygame.display.flip()
-    #     clock.tick(FPS)
+    except pygame.error as e:
+        print(f"Error loading image: {e}")
+        frame_img = None
 
+    while True:
+        #draw_bg(bg_image, is_game_started=False)
+        screen.blit(bg_image, (0,0))
+        button_width = 280
+        button_height = 60
+        exit_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+                                       SCREEN_HEIGHT * 0.75, button_width, button_height)
+        results_factor = 0.08
+        rotation_angle = 45
+        #winner_txt = gen_text_img('WINNER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), GREEN)
+        winner_txt = render_outlined_text('WINNER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), GREEN, BLACK, 2)
+        winner_txt = pygame.transform.rotate(winner_txt, rotation_angle)
+        #loser_txt = gen_text_img('LOSER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), RED)
+        loser_txt = render_outlined_text('LOSER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), RED, BLACK, 2)
+        loser_txt = pygame.transform.rotate(loser_txt, rotation_angle)
+        if frame_img is not None:
+            f1_x = SCREEN_WIDTH * 0.1
+            f1_y = SCREEN_HEIGHT * 0.2
+            f2_x = SCREEN_WIDTH * 0.9 - frame_img.get_width()
+            screen.blit(frame_img, (f1_x, f1_y))
+            screen.blit(frame_img, (f2_x, f1_y))
 
-        #pygame.display.update()
-
-        # for text in countdown_texts:
-        #     print(text)
-        #     draw_bg(bg_image, is_game_started=True)
-
+        if winningPope is not None and winningPope.image is not None:
+            scaled_img = aspect_scale(winningPope.image, img_size)
+            sx = f1_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+            sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
+            screen.blit(scaled_img, (sx,sy))
+            winner_rect = winner_txt.get_rect(center=(f1_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
+            screen.blit(winner_txt, winner_rect)
+            if winningPope.name is not None:
+                lpn_img = gen_text_img(winningPope.name, frame_font, BLACK)
+                lpn_x = f1_x + (frame_img.get_width() - lpn_img.get_width()) // 2
+                lpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - lpn_img.get_height()) // 2
+                screen.blit(lpn_img, (lpn_x, lpn_y))
+        if losingPope is not None and losingPope.image is not None:
+            scaled_img = aspect_scale(losingPope.image, img_size)
+            sx = f2_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+            sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
+            screen.blit(scaled_img, (sx,sy))
+            dim_overlay = pygame.Surface(scaled_img.get_size(), pygame.SRCALPHA)
+            dim_overlay.fill((0, 0, 0, 128)) 
+            screen.blit(dim_overlay, (sx,sy))
+            loser_rect = winner_txt.get_rect(center=(f2_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
+            screen.blit(loser_txt, loser_rect)
+            if losingPope.name is not None:
+                rpn_img = gen_text_img(losingPope.name, frame_font, BLACK)
+                rpn_x = f2_x + (frame_img.get_width() - rpn_img.get_width()) // 2
+                rpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - rpn_img.get_height()) // 2
+                screen.blit(rpn_img, (rpn_x, rpn_y))
             
-        #     if text == countdown_texts[-1]:
-                
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if exit_button.collidepoint(event.pos):
+                    return
+                # if scores_button.collidepoint(event.pos):
+                #     return "SCORES"
+                # if exit_button.collidepoint(event.pos):
+                #     pygame.quit()
+                #     exit()
+                pass
+            elif event.type == pygame.JOYBUTTONDOWN:
+                if event.button == START_BUTTON:
+                    return
 
-        #     pygame.time.delay(1000)
+        pygame.display.update()
+        clock.tick(FPS)
+
+    return
 
 def configure_joysticks():
     num_joysticks = 2 # number needed to proceed
@@ -679,6 +764,7 @@ def configure_joysticks():
         pygame.display.flip()
 
 def game_loop():
+    START_BUTTON = 9
     global score
     reset_game()
     round_over = False
@@ -696,6 +782,7 @@ def game_loop():
     countdown()
     winnerID : int = None
     loserID : int = None
+    exit_button = None
 
     while True:
         #draw_bg(bg_image, is_game_started=game_started)
@@ -751,17 +838,21 @@ def game_loop():
             pygame.draw.line(screen, (255,255,0), (0, SCREEN_HEIGHT * baseline_ypos), (SCREEN_WIDTH, SCREEN_HEIGHT * baseline_ypos), width=3)
             if pygame.time.get_ticks() - curr_time > health_delay:
                 curr_time = pygame.time.get_ticks()
-                # if fighter_1.health > 0:
-                #     fighter_1.health -= 20
-                # if fighter_1.health <= 0:
-                #     fighter_2.victory = True
+                fighter = fighter_2
+                winner = fighter_1
+                if fighter.health > 0:
+                    fighter.health -= 20
+                if fighter.health <= 0:
+                    winner.victory = True
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if exit_button is not None and exit_button.collidepoint(event.pos):
-                    return
+            if exit_button is not None:
+                if event.type == pygame.MOUSEBUTTONDOWN and exit_button.collidepoint(event.pos):
+                    return winnerID, loserID
+                elif event.type == pygame.JOYBUTTONDOWN and event.button == START_BUTTON:
+                    return winnerID, loserID
 
         pygame.display.update()
         clock.tick(FPS)
@@ -773,6 +864,7 @@ while True:
         winner, loser = game_loop()
         record_result(winner, loser)
 
+        scores_screen()
         exit()
     else:
         menu_selection = main_menu()
