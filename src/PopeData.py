@@ -18,12 +18,17 @@ class PopeData:
         self.image_file : str = ''
         self.image = None
         self.length_of_reign : float = 0.0
+        self.wins : int = 0
+        self.losses : int = 0
 
     def __str__(self):
-        return f'{self.id}, {self.name}'
+        return f'Pope #{self.id}, {self.name}'
     
     def statsString(self):
-        return f'{self.id}, {self.name}, {self.holiness}, {self.miracles}, {self.wisdom}, {self.legacy}, {self.length_of_reign}'
+        return f'Pope #{self.id}, {self.name}, {self.holiness}, {self.miracles}, {self.wisdom}, {self.legacy}, {self.length_of_reign}'
+    
+    def recordString(self):
+        return f'Pope #{self.id}, {self.name}: ({self.wins} - {self.losses})'
 
     def parseFromPandasRow(self, row):
         self.name = str(row['name'])
@@ -52,3 +57,11 @@ class PopeData:
         self.legacy = int(data['legacy'])
         self.length_of_reign = float(data['length_of_reign'])
         #print(self.statsString())
+
+    def updateWinLossFromJSON(self, jsonData):
+        data = json.loads(jsonData)
+        if self.id != data['ID']:
+            return
+        
+        self.wins = int(data['wins'])
+        self.losses = int(data['losses'])
