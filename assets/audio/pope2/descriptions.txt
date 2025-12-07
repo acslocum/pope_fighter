@@ -2,3 +2,4 @@
 sound, attack
 sound, hit
 sound, victory
+sound, dying
