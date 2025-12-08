@@ -89,6 +89,7 @@ popeServerURL = popeServerBaseURL + popeIDEndpoint
 popeWinEndpoint = popeServerBaseURL + 'win/' # add 'popeid'
 popeLoseEndpoint = popeServerBaseURL + 'lose/' # add 'popeid'
 gameOverEndpoint = popeServerBaseURL + 'game/' # add 'winnerID/loserID'
+scoreboardEndpoint = popeServerBaseURL + 'scoreboard/' # add 'winnerID/loserID'
 
 left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
@@ -220,6 +221,23 @@ def draw_gradient_text(text, font, x, y, colors):
         img = font.render(text, True, color)
         screen.blit(img, (x + i * offset, y + i * offset))
 
+def draw_table(surface, data, start_x, start_y, cell_w, cell_h, font):
+    for r_idx, row in enumerate(data):
+        for c_idx, cell_text in enumerate(row):
+            x = start_x + c_idx * cell_w
+            y = start_y + r_idx * cell_h
+
+            # Draw cell background
+            color = (200,200,200) if r_idx % 2 == 0 else (128,128,128)
+            pygame.draw.rect(surface, color, (x, y, cell_w, cell_h))
+
+            # Draw cell borders
+            pygame.draw.rect(surface, BLACK, (x, y, cell_w, cell_h), 1) # 1-pixel border
+
+            # Render and blit text
+            text_surface = font.render(cell_text, True, BLACK)
+            text_rect = text_surface.get_rect(center=(x + cell_w // 2, y + cell_h // 2))
+            surface.blit(text_surface, text_rect)
 
 def main_menu():
     animation_start_time = pygame.time.get_ticks()
@@ -429,30 +447,42 @@ def main_menu():
         clock.tick(FPS)
 
 
-def scores_screen():
+def scores_screen(winner, loser):
+    count = 10
+    START_BUTTON = 9
+    endpoint = f'{scoreboardEndpoint}{str(count)}/{winner}/{loser}'
+    print(f'Sending end game: {endpoint}')
+    response = requests.get(endpoint, timeout=0.5)
+    # print(f'scores_screen(): response: {response.content}')
+    data = response.json()
+    table_data = [ ['#', 'Name', 'Wins', 'Losses'] ]# will be an array of arrays, first array is the header
+    for key in data:
+        line = [str(int(key) + 1)]
+        name = data[key]['name']
+        wins = data[key]['wins']
+        losses = data[key]['losses']
+        line.append(str(name))
+        line.append(str(wins))
+        line.append(str(losses))
+        table_data.append(line)
+
+    print(table_data)
+    
     while True:
         #draw_bg(bg_image)
         screen.blit(bg_image, (0,0))
 
-        scores_title = "SCORES"
+        scores_title = "HIGH SCORES"
         draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
 
         score_font_large = pygame.font.Font(font_name, 60)  # Increased size for scores
-        p1_text = f"P1: {score[0]}"
-        p2_text = f"P2: {score[1]}"
-        shadow_offset = 5
+        
+        draw_table(screen, table_data, SCREEN_WIDTH * 0.1, SCREEN_HEIGHT * 0.1, 200, 60, score_font_large)
 
-        p1_text_x = SCREEN_WIDTH // 2 - score_font_large.size(p1_text)[0] // 2
-        p1_text_y = SCREEN_HEIGHT // 2 - 50
-        draw_text(p1_text, score_font_large, BLACK, p1_text_x + shadow_offset, p1_text_y + shadow_offset)  # Shadow
-        draw_gradient_text(p1_text, score_font_large, p1_text_x, p1_text_y, [BLUE, GREEN])  # Gradient
-
-        p2_text_x = SCREEN_WIDTH // 2 - score_font_large.size(p2_text)[0] // 2
-        p2_text_y = SCREEN_HEIGHT // 2 + 50
-        draw_text(p2_text, score_font_large, BLACK, p2_text_x + shadow_offset, p2_text_y + shadow_offset)  # Shadow
-        draw_gradient_text(p2_text, score_font_large, p2_text_x, p2_text_y, [RED, YELLOW])  # Gradient
-
-        return_button = draw_button("RETURN TO MAIN MENU", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - 220, 700, 500, 50)
+        button_width = 280
+        button_height = 60
+        return_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+                                       SCREEN_HEIGHT * 0.75, button_width, button_height)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -460,6 +490,15 @@ def scores_screen():
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if return_button.collidepoint(event.pos):
+                    return
+                # if scores_button.collidepoint(event.pos):
+                #     return "SCORES"
+                # if exit_button.collidepoint(event.pos):
+                #     pygame.quit()
+                #     exit()
+                pass
+            elif event.type == pygame.JOYBUTTONDOWN:
+                if event.button == START_BUTTON:
                     return
 
         pygame.display.update()
@@ -865,7 +904,7 @@ while True:
         winner, loser = game_loop()
         record_result(winner, loser)
 
-        scores_screen()
+        scores_screen(winner, loser)
         exit()
     else:
         menu_selection = main_menu()
@@ -873,5 +912,6 @@ while True:
         if menu_selection == "START":
             winner, loser = game_loop()
             record_result(winner, loser)
+            scores_screen(winner, loser)
         elif menu_selection == "SCORES":
             scores_screen()
