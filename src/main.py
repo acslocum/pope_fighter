@@ -880,10 +880,10 @@ def game_loop():
                 curr_time = pygame.time.get_ticks()
                 fighter = fighter_2
                 winner = fighter_1
-                if fighter.health > 0:
-                    fighter.health -= 20
-                if fighter.health <= 0:
-                    winner.victory = True
+                # if fighter.health > 0:
+                #     fighter.health -= 20
+                # if fighter.health <= 0:
+                #     winner.victory = True
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
