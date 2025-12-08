@@ -259,9 +259,10 @@ def main_menu():
             f2_x = SCREEN_WIDTH * 0.9 - frame_img.get_width()
             screen.blit(frame_img, (f1_x, f1_y))
             screen.blit(frame_img, (f2_x, f1_y))
-            vsImgShadow = gen_text_img('VS.', pygame.font.Font(font_name, int(SCREEN_HEIGHT * 0.1)), BLACK)
-            vsImg = gen_text_img('VS.', pygame.font.Font(font_name, int(SCREEN_HEIGHT * 0.1)), YELLOW)
-            screen.blit(vsImgShadow, ((SCREEN_WIDTH - vsImg.get_width() + shadow_offset) // 2, (SCREEN_HEIGHT - vsImg.get_height() + shadow_offset) // 2))
+            # vsImgShadow = gen_text_img('VS.', pygame.font.Font(font_name, int(SCREEN_HEIGHT * 0.1)), BLACK)
+            # vsImg = gen_text_img('VS.', pygame.font.Font(font_name, int(SCREEN_HEIGHT * 0.1)), YELLOW)
+            vsImg = render_outlined_text('VS.', pygame.font.Font(font_name, int(SCREEN_HEIGHT * 0.1)), YELLOW, BLACK, 2)
+            # screen.blit(vsImgShadow, ((SCREEN_WIDTH - vsImg.get_width() + shadow_offset) // 2, (SCREEN_HEIGHT - vsImg.get_height() + shadow_offset) // 2))
             screen.blit(vsImg, ((SCREEN_WIDTH - vsImg.get_width()) // 2, (SCREEN_HEIGHT - vsImg.get_height()) // 2))
 
         elapsed_time = (pygame.time.get_ticks() - animation_start_time) / 1000
