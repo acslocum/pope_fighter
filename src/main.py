@@ -114,7 +114,7 @@ def gen_text_img(text, font, color):
     img = font.render(text, True, color)
     return img
 
-def render_outlined_text(text, font, text_color, outline_color, outline_width):
+def render_outlined_text(text, font, text_color, outline_color, outline_width = 2):
     # Render the outline text
     outline_surface = font.render(text, True, outline_color)
     
