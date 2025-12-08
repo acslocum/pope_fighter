@@ -64,10 +64,12 @@ victory_img = pygame.image.load(resource_path("assets/images/victory.png")).conv
 #font_name = 'assets/fonts/Papyrus.ttc'
 font_name = 'assets/fonts/Praetoria D.otf'
 #font_name = 'assets/fonts/spqr.ttf'
+#font_name = 'assets/fonts/Archeologicaps.ttf'
 menu_font = pygame.font.Font(resource_path(font_name), 50)
 menu_font_title = pygame.font.Font(resource_path(font_name), 100)  # Larger font for title
 count_font = pygame.font.Font(resource_path(font_name), 80)
 score_font = pygame.font.Font(resource_path(font_name), 30)
+high_scores_font = pygame.font.Font(resource_path('assets/fonts/Academy Engraved LET Fonts.ttf'), 80)
 frame_font = pygame.font.SysFont('Arial', 20, bold=True, italic=False)
 # Music and Sounds
 #pygame.mixer.music.load(resource_path("assets/audio/music.mp3"))
@@ -221,23 +223,62 @@ def draw_gradient_text(text, font, x, y, colors):
         img = font.render(text, True, color)
         screen.blit(img, (x + i * offset, y + i * offset))
 
-def draw_table(surface, data, start_x, start_y, cell_w, cell_h, font):
-    for r_idx, row in enumerate(data):
-        for c_idx, cell_text in enumerate(row):
-            x = start_x + c_idx * cell_w
-            y = start_y + r_idx * cell_h
+def draw_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pygame.Surface:
+    #font_size = 60
+    #font = pygame.font.Font(font_name, font_size)  # Increased size for scores
+    font = high_scores_font
+    h_pad = 40 # pixels between columns
+    v_pad = 20 # pixels between rows
+    row_height = 0
+    outline_width = 1
 
-            # Draw cell background
-            color = (200,200,200) if r_idx % 2 == 0 else (128,128,128)
-            pygame.draw.rect(surface, color, (x, y, cell_w, cell_h))
+    # render all the cells first
+    cell_images : list[list[pygame.Surface]] = []
+    col_widths = [0] * len(data[0])
+    #print(f'col_widths: {col_widths}')
+    for row in range(len(data)):
+        #print(f'data_row: {data_row}')
+        cell_row : list[pygame.Surface] = []
+        for col in range(len(data[row])):
+            if wl_rows is not None and row in wl_rows:
+                if row == wl_rows[0]:
+                    text_surface = render_outlined_text(data[row][col], font, (44,234,26), (131,131,131), outline_width)
+                elif row == wl_rows[1]:
+                    text_surface = render_outlined_text(data[row][col], font, (255, 78, 36), (131,131,131), outline_width)
+            else:
+                text_surface = render_outlined_text(data[row][col], font, (237,220,26), (130,95,8), outline_width)
+            if text_surface.get_width() > col_widths[col]:
+                col_widths[col] = text_surface.get_width()
+            if text_surface.get_height() > row_height:
+                row_height = text_surface.get_height()
+            cell_row.append(text_surface)
+        cell_images.append(cell_row)
+    #print(f'col_widths: {col_widths}')
 
-            # Draw cell borders
-            pygame.draw.rect(surface, BLACK, (x, y, cell_w, cell_h), 1) # 1-pixel border
+    # calculate column offsets
+    col_offsets = [ ]
+    offset = 0
+    for width in col_widths:
+        col_offsets.append(offset)
+        offset += width + h_pad
+    #print(f'col_offsets: {col_offsets}')
 
-            # Render and blit text
-            text_surface = font.render(cell_text, True, BLACK)
-            text_rect = text_surface.get_rect(center=(x + cell_w // 2, y + cell_h // 2))
-            surface.blit(text_surface, text_rect)
+    # create surface big enough to hold everything
+    surface_width = (len(col_widths) - 1) * h_pad + sum(col_widths)
+    surface_height = (len(data) - 1) * h_pad + len(data) * row_height
+    table_surface = pygame.Surface( (surface_width, surface_height), pygame.SRCALPHA)
+
+    # render each image
+    center_cols = [0, 2, 3] # we want these columns to be centered
+    for row in range(len(cell_images)):
+        for col in range(len(cell_images[row])):
+            x = col_offsets[col]
+            if col in center_cols:
+                x += (col_widths[col] - cell_images[row][col].get_width()) // 2
+            y = row_height * row + v_pad * row
+            table_surface.blit(cell_images[row][col], (x,y))
+
+    return table_surface
 
 def main_menu():
     animation_start_time = pygame.time.get_ticks()
@@ -455,29 +496,44 @@ def scores_screen(winner, loser):
     response = requests.get(endpoint, timeout=0.5)
     # print(f'scores_screen(): response: {response.content}')
     data = response.json()
-    table_data = [ ['#', 'Name', 'Wins', 'Losses'] ]# will be an array of arrays, first array is the header
+    table_data = [ ['Rank', 'Name', 'Record'] ]# will be an array of arrays, first array is the header
+    line_num = 1 # header row is line 0
+    winningPope = popeDB[winner]
+    losingPope = popeDB[loser]
+    winner_line = None
+    loser_line = None
     for key in data:
         line = [str(int(key) + 1)]
         name = data[key]['name']
+        if name == winningPope.name:
+            winner_line = line_num
+        elif name == losingPope.name:
+            loser_line = line_num
         wins = data[key]['wins']
         losses = data[key]['losses']
         line.append(str(name))
-        line.append(str(wins))
-        line.append(str(losses))
+        line.append(f'{str(wins)} - {str(losses)}')
         table_data.append(line)
-
+        line_num += 1
     print(table_data)
+    if winner_line is not None and loser_line is not None:
+        wl_rows = (winner_line, loser_line)
+    else:
+        wl_rows = None
+    tbl_surf = draw_table(table_data, wl_rows)
     
     while True:
         #draw_bg(bg_image)
         screen.blit(bg_image, (0,0))
+        dim_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+        dim_overlay.fill((0, 0, 0, 128)) 
+        screen.blit(dim_overlay, (0,0))
 
         scores_title = "HIGH SCORES"
-        draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
-
-        score_font_large = pygame.font.Font(font_name, 60)  # Increased size for scores
-        
-        draw_table(screen, table_data, SCREEN_WIDTH * 0.1, SCREEN_HEIGHT * 0.1, 200, 60, score_font_large)
+        scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
+        screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
+        #draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
+        screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, (SCREEN_HEIGHT - tbl_surf.get_height()) // 2) )
 
         button_width = 280
         button_height = 60
