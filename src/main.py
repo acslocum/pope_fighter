@@ -476,7 +476,7 @@ def main_menu():
                         elif id in previousMatch:
                             draw_error_msg('You just played in the previous match!\nGive someone else a chance!')
                         elif lastPopeID == id:
-                            print(f'Ignoring duplicate scane for {id}')
+                            print(f'Ignoring duplicate scan for {id}')
                         else:
                             print(f'Scanned in unknown pope ID: {id}')
                     else:
