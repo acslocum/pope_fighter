@@ -73,13 +73,6 @@ score_font = pygame.font.Font(resource_path(font_name), 30)
 high_scores_font = pygame.font.Font(resource_path('assets/fonts/Academy Engraved LET Fonts.ttf'), 80)
 frame_font = pygame.font.SysFont('Arial', 20, bold=True, italic=False)
 # Music and Sounds
-#pygame.mixer.music.load(resource_path("assets/audio/music.mp3"))
-# pygame.mixer.music.set_volume(0.5)
-# pygame.mixer.music.play(-1, 0.0, 5000)
-# sword_fx = pygame.mixer.Sound(resource_path("assets/audio/sword.wav"))
-# sword_fx.set_volume(0.5)
-# magic_fx = pygame.mixer.Sound(resource_path("assets/audio/magic.wav"))
-# magic_fx.set_volume(0.75)
 game_sounds = GameSounds('assets/audio')
 pope1_game_sounds = GameSounds('assets/audio/pope1')
 pope2_game_sounds = GameSounds('assets/audio/pope2')
@@ -283,10 +276,7 @@ def draw_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pyga
 
 def main_menu():
     animation_start_time = pygame.time.get_ticks()
-    prefix = 'A'
-    suffix = 'Z'
     scanned = ''
-    requiredScanLength = 3 + len(prefix) + len(suffix) # required length of keys to grab from a scan
     global left_pope
     global right_pope
     left_pope_name = None
@@ -389,16 +379,6 @@ def main_menu():
                 rpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - rpn_img.get_height()) // 2
                 screen.blit(rpn_img, (rpn_x, rpn_y))
             
-        #scores_button_y = SCREEN_HEIGHT // 2 - (button_height + button_spacing) * 0.5 + 50
-        #exit_button_y = SCREEN_HEIGHT // 2 + (button_height + button_spacing) * 0.5 + 50
-
-        # start_button = draw_button("START GAME", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-        #                            start_button_y, button_width, button_height)
-        # scores_button = draw_button("SCORES", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-        #                             scores_button_y, button_width, button_height)
-        # exit_button = draw_button("EXIT", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-        #                           exit_button_y, button_width, button_height)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -548,11 +528,6 @@ def scores_screen(winner, loser):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if return_button.collidepoint(event.pos):
                     return
-                # if scores_button.collidepoint(event.pos):
-                #     return "SCORES"
-                # if exit_button.collidepoint(event.pos):
-                #     pygame.quit()
-                #     exit()
                 pass
             elif event.type == pygame.JOYBUTTONDOWN:
                 if event.button == START_BUTTON:
@@ -679,9 +654,6 @@ def record_result(winner, loser):
         popeDB[id].wins = wins
         popeDB[id].losses = losses
 
-    # print(winningPope.recordString())
-    # print(losingPope.recordString())
-
     frame_file = 'assets/images/frame.png'
     frame_offset = 98 # number of pixels in x & y in original scale that image portions starts
     frame_height_percent = 0.6 # % of screen height frame's height should occupy
@@ -755,11 +727,6 @@ def record_result(winner, loser):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if exit_button.collidepoint(event.pos):
                     return
-                # if scores_button.collidepoint(event.pos):
-                #     return "SCORES"
-                # if exit_button.collidepoint(event.pos):
-                #     pygame.quit()
-                #     exit()
                 pass
             elif event.type == pygame.JOYBUTTONDOWN:
                 if event.button == START_BUTTON:
@@ -888,14 +855,10 @@ def game_loop():
         p1_name = left_pope.name if left_pope is not None else 'Pope Testus I'
         p2_name = right_pope.name if right_pope is not None else 'Pope Beta IV'
 
-        #draw_text(f"P1: {score[0]}", score_font, WHITE, 20, 20)
-        #draw_text(f"P2: {score[1]}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
         draw_text(f"{p1_name}", score_font, WHITE, 20, 20)
         draw_text(f"{p2_name}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
         fighter_1.draw_health_bar(screen, pygame.Rect(20,50,200,20),False)
         fighter_2.draw_health_bar(screen, pygame.Rect(SCREEN_WIDTH-220,50,200,20), True)
-
-        #exit_button = draw_button("MaiN MeNu", menu_font, BLACK, YELLOW, SCREEN_WIDTH // 2 - 150, 20, 300, 50)
 
         if not round_over:
             fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, fighter_2, round_over)
@@ -905,19 +868,14 @@ def game_loop():
             fighter_2.update()
 
             if not fighter_1.alive:
-            #     score[1] += 1
-            #     round_over = True
                 winner_img = left_pope.image 
                 winnerID = left_pope.id
                 loserID = right_pope.id
             elif not fighter_2.alive:
-            #     score[0] += 1
-            #     round_over = True
                 winner_img = right_pope.image
                 winnerID = right_pope.id
                 loserID = left_pope.id
             if fighter_1.finished and fighter_2.finished:
-                #round_over = True
                 button_width = 280
                 button_height = 60
                 exit_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
