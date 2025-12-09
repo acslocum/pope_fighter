@@ -274,11 +274,51 @@ def draw_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pyga
 
     return table_surface
 
+def draw_error_msg(msg : str, timeout = 3000):
+    if not isinstance(msg, str):
+        print(f'draw_error_msg(): didn\'t get a str, got {type(msg)}')
+        return
+    
+    padding : int = 20
+    max_height : int  = 0
+    max_width : int  = 0
+
+    # split message on \n character, then render each line to an image
+    errorMsgArray : list[str]= msg.split('\n')
+    errorMsgImages : list[pygame.surface.Surface] = []
+    for errMessage in errorMsgArray:
+        errMsgImg = render_outlined_text(errMessage, pygame.font.Font(font_name, int(SCREEN_HEIGHT * 0.05)), (255,0,0), (255,255,255), 1)
+        errorMsgImages.append(errMsgImg)
+        max_width = errMsgImg.get_width() if errMsgImg.get_width() > max_width else max_width
+        max_height = errMsgImg.get_height() if errMsgImg.get_height() > max_height else max_height
+
+    # now draw background big enough to hold it all, and blit each item onto it
+    total_height : int  = len(errorMsgImages) * max_height + 2 * padding
+    backingSurf : pygame.surface.Surface = pygame.surface.Surface( (max_width, total_height), pygame.SRCALPHA)
+    backingSurf.fill( (0,0,0,0) )
+    offset : int  = padding
+    for img in errorMsgImages:
+        backingSurf.blit(img, ( (max_width - img.get_width()) // 2 , offset))
+        offset += max_height
+
+    # center error message on screen
+    backingSurfRect = backingSurf.get_rect()
+    backingSurfRect.center = screen.get_rect().center
+    dim_overlay : pygame.surface.Surface = pygame.surface.Surface( (screen.get_width(), screen.get_height()), pygame.SRCALPHA)
+    dim_overlay.fill( (0,0,0,128) )
+    screen.blit(dim_overlay, (0,0))
+    screen.blit(backingSurf, backingSurfRect)
+
+    # display and delay
+    pygame.display.update()
+    pygame.time.delay(3000)
+
 def main_menu():
     animation_start_time = pygame.time.get_ticks()
     scanned = ''
     global left_pope
     global right_pope
+    global previousMatch
     left_pope_name = None
     right_pope_name = None
     lastPopeID = None # keep track of previously scanned pope ID so it doesn't get scanned twice
@@ -404,7 +444,7 @@ def main_menu():
                     if lastSlashIndex != -1:
                         strID = scanned[lastSlashIndex:]
                         id = int(strID)
-                        if lastPopeID != id and id in popeDB:
+                        if id not in previousMatch and lastPopeID != id and id in popeDB:
                             lastPopeID = id
                             pope = popeDB[id]
                             print(f'Scanned in pope ID: {id}, {pope.name}, querying server...')
@@ -433,6 +473,8 @@ def main_menu():
                             if left_pope and right_pope:
                                 print(f'We\'ve got a match {left_pope.name} vs. {right_pope.name}')
                                 #return "START"
+                        elif id in previousMatch:
+                            draw_error_msg('You just played in the previous match!\nGive someone else a chance!')
                         elif lastPopeID == id:
                             print(f'Ignoring duplicate scane for {id}')
                         else:
@@ -447,7 +489,9 @@ def main_menu():
                     if re.search(r"\d{3}", scanned) is not None:
                         strID = scanned[1:]
                         id = int(strID)
-                        if id in popeDB:
+                        if id in previousMatch:
+                            draw_error_msg('You just played in the previous match!\nGive someone else a chance!')
+                        elif id in popeDB:
                             pope = popeDB[id]
                             print(f'Scanned in pope ID: {id}, {pope.name}, loading from local DB...')
                             if left_pope is None:
@@ -460,6 +504,7 @@ def main_menu():
                             # check to see if we have two popes
                             if left_pope and right_pope:
                                 print(f'We\'ve got a match {left_pope.name} vs. {right_pope.name}')
+                                previousMatch = [left_pope.id, right_pope.id]
                                 #return "START"
                     
                         # reset for next scan
