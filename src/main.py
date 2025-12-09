@@ -33,6 +33,7 @@ SCREEN_WIDTH = info.current_w
 SCREEN_HEIGHT = info.current_h
 #SCREEN_WIDTH = 1778
 #SCREEN_HEIGHT = 1000
+NEXT_BUTTON_Y = SCREEN_HEIGHT * 0.8 # set a consistent height for the 'Next' button that is present on most screens
 FPS = 60
 ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
@@ -538,7 +539,7 @@ def scores_screen(winner, loser):
         button_width = 280
         button_height = 60
         return_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                       SCREEN_HEIGHT * 0.75, button_width, button_height)
+                                       NEXT_BUTTON_Y, button_width, button_height)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -703,7 +704,7 @@ def record_result(winner, loser):
         button_width = 280
         button_height = 60
         exit_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                       SCREEN_HEIGHT * 0.75, button_width, button_height)
+                                       NEXT_BUTTON_Y, button_width, button_height)
         results_factor = 0.08
         rotation_angle = 45
         #winner_txt = gen_text_img('WINNER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), GREEN)
@@ -920,7 +921,7 @@ def game_loop():
                 button_width = 280
                 button_height = 60
                 exit_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                       SCREEN_HEIGHT * 0.75, button_width, button_height)
+                                       NEXT_BUTTON_Y, button_width, button_height)
 
                 pass
         else:
