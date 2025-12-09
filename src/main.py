@@ -70,7 +70,7 @@ menu_font = pygame.font.Font(resource_path(font_name), 50)
 menu_font_title = pygame.font.Font(resource_path(font_name), 100)  # Larger font for title
 count_font = pygame.font.Font(resource_path(font_name), 80)
 score_font = pygame.font.Font(resource_path(font_name), 30)
-high_scores_font = pygame.font.Font(resource_path('assets/fonts/Academy Engraved LET Fonts.ttf'), 80)
+high_scores_font = pygame.font.Font(resource_path('assets/fonts/Academy Engraved LET Fonts.ttf'), 60)
 frame_font = pygame.font.SysFont('Arial', 20, bold=True, italic=False)
 # Music and Sounds
 game_sounds = GameSounds('assets/audio')
@@ -514,7 +514,7 @@ def scores_screen(winner, loser):
         scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
         screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
         #draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
-        screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, (SCREEN_HEIGHT - tbl_surf.get_height()) // 2) )
+        screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, 0.1 * SCREEN_HEIGHT ) )
 
         button_width = 280
         button_height = 60
