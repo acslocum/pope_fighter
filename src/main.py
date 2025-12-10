@@ -320,6 +320,7 @@ def main_menu():
     global left_pope
     global right_pope
     global previousMatch
+    START_BUTTON = 9
     left_pope_name = None
     right_pope_name = None
     lastPopeID = None # keep track of previously scanned pope ID so it doesn't get scanned twice
@@ -390,7 +391,7 @@ def main_menu():
             clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
             clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
             start_button = draw_button("START GAME", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                       SCREEN_HEIGHT * 0.75, button_width, button_height)
+                                       NEXT_BUTTON_Y, button_width, button_height)
         else:
             # need to scan first pope
             pygame.draw.rect(screen, WHITE, (f1_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
@@ -427,12 +428,9 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.collidepoint(event.pos):
                     return "START"
-                # if scores_button.collidepoint(event.pos):
-                #     return "SCORES"
-                # if exit_button.collidepoint(event.pos):
-                #     pygame.quit()
-                #     exit()
-                pass
+            elif start_button is not None and event.type == pygame.JOYBUTTONDOWN:
+                if event.button == START_BUTTON:
+                    return
             elif event.type == pygame.KEYDOWN:
                 #print(len(pygame.key.name(event.key)))
                 #scanned += event.unicode.upper()
