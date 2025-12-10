@@ -50,8 +50,8 @@ GREEN = (0, 255, 0)
 
 # Initialize Game Window
 game_title = 'POPÉMON: ACENSIO'
-#screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+#screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(game_title)
 clock = pygame.time.Clock()
 
