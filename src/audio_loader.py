@@ -6,7 +6,7 @@ import random
 class GameSounds:
     def __init__(self, directory : str = None):
         self.music = []
-        self.sounds = {}
+        self.sounds : dict[str, list[pygame.mixer.Sound]] = {}
 
         if directory is not None:
             self.loadSounds(directory)
