@@ -1008,3 +1008,5 @@ while True:
             winner, loser = game_loop()
             record_result(winner, loser)
             scores_screen(winner, loser)
+            left_pope = None
+            right_pope = None
