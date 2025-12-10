@@ -91,6 +91,7 @@ left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
 left_joystick : pygame.joystick.Joystick = None
 right_joystick : pygame.joystick.Joystick = None
+previousMatch : list[int] = []
 
 popeDB = db_parser.getPopes('assets/db/Pope-mon_stats.xlsx')
 #print(f'pope DB size: {len(popeDB)}')
