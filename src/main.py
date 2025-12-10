@@ -38,7 +38,7 @@ FPS = 60
 ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
 game_debug = False
-game_debug = True
+# game_debug = True
 
 # Colors
 RED = (255, 0, 0)
@@ -541,7 +541,10 @@ def scores_screen(winner, loser):
         line.append(f'{str(wins)} - {str(losses)}')
         table_data.append(line)
         line_num += 1
-    print(table_data)
+    #print(table_data)
+    if game_debug:
+        while len(table_data) < 13:
+            table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
     if winner_line is not None and loser_line is not None:
         wl_rows = (winner_line, loser_line)
     else:
