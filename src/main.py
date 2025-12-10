@@ -520,70 +520,80 @@ def scores_screen(winner, loser):
     START_BUTTON = 9
     endpoint = f'{scoreboardEndpoint}{str(count)}/{winner}/{loser}'
     print(f'Sending end game: {endpoint}')
-    response = requests.get(endpoint, timeout=0.5)
-    # print(f'scores_screen(): response: {response.content}')
-    data = response.json()
-    table_data = [ ['Rank', 'Name', 'Record'] ]# will be an array of arrays, first array is the header
-    line_num = 1 # header row is line 0
-    winningPope = popeDB[winner]
-    losingPope = popeDB[loser]
-    winner_line = None
-    loser_line = None
-    for key in data:
-        line = [str(int(key) + 1)]
-        name = data[key]['name']
-        if name == winningPope.name:
-            winner_line = line_num
-        elif name == losingPope.name:
-            loser_line = line_num
-        wins = data[key]['wins']
-        losses = data[key]['losses']
-        line.append(str(name))
-        line.append(f'{str(wins)} - {str(losses)}')
-        table_data.append(line)
-        line_num += 1
-    #print(table_data)
-    if game_debug:
-        while len(table_data) < 13:
-            table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
-    if winner_line is not None and loser_line is not None:
-        wl_rows = (winner_line, loser_line)
-    else:
-        wl_rows = None
-    tbl_surf = draw_table(table_data, wl_rows)
-    
-    while True:
-        #draw_bg(bg_image)
-        screen.blit(bg_image, (0,0))
-        dim_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-        dim_overlay.fill((0, 0, 0, 128)) 
-        screen.blit(dim_overlay, (0,0))
+    response = None
+    try:
+        # Set a timeout of 0.5 seconds (500 milliseconds)
+        response = requests.get(endpoint, timeout=0.5)
+        # print(f"Request successful with status code: {response.status_code}")
+        # print(f'scores_screen(): response: {response.content}')
+        data = response.json()
+        table_data = [ ['Rank', 'Name', 'Record'] ]# will be an array of arrays, first array is the header
+        line_num = 1 # header row is line 0
+        winningPope = popeDB[winner]
+        losingPope = popeDB[loser]
+        winner_line = None
+        loser_line = None
+        for key in data:
+            line = [str(int(key) + 1)]
+            name = data[key]['name']
+            if name == winningPope.name:
+                winner_line = line_num
+            elif name == losingPope.name:
+                loser_line = line_num
+            wins = data[key]['wins']
+            losses = data[key]['losses']
+            line.append(str(name))
+            line.append(f'{str(wins)} - {str(losses)}')
+            table_data.append(line)
+            line_num += 1
+        #print(table_data)
+        if game_debug:
+            while len(table_data) < 13:
+                table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
+        if winner_line is not None and loser_line is not None:
+            wl_rows = (winner_line, loser_line)
+        else:
+            wl_rows = None
+        tbl_surf = draw_table(table_data, wl_rows)
+        
+        while True:
+            #draw_bg(bg_image)
+            screen.blit(bg_image, (0,0))
+            dim_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+            dim_overlay.fill((0, 0, 0, 128)) 
+            screen.blit(dim_overlay, (0,0))
 
-        scores_title = "HIGH SCORES"
-        scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
-        screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
-        #draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
-        screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, 0.1 * SCREEN_HEIGHT ) )
+            scores_title = "HIGH SCORES"
+            scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
+            screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
+            #draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
+            screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, 0.1 * SCREEN_HEIGHT ) )
 
-        button_width = 280
-        button_height = 60
-        return_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                       NEXT_BUTTON_Y, button_width, button_height)
+            button_width = 280
+            button_height = 60
+            return_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+                                        NEXT_BUTTON_Y, button_width, button_height)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if return_button.collidepoint(event.pos):
-                    return
-                pass
-            elif event.type == pygame.JOYBUTTONDOWN:
-                if event.button == START_BUTTON:
-                    return
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if return_button.collidepoint(event.pos):
+                        return
+                    pass
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == START_BUTTON:
+                        return
 
-        pygame.display.update()
-        clock.tick(FPS)
+            pygame.display.update()
+            clock.tick(FPS)
+    except requests.exceptions.Timeout:
+        print("scores_screen(): The request timed out after 500 milliseconds.")
+        response = None
+    except requests.exceptions.RequestException as e:
+        print(f"scores_screen(): An error occurred: {e}")
+        response = None
 
 def reset_game():
     global fighter_1, fighter_2
@@ -692,99 +702,105 @@ def record_result(winner, loser):
 
     endpoint = f'{gameOverEndpoint}{winner}/{loser}'
     print(f'Sending end game: {endpoint}')
-    response = requests.get(endpoint, timeout=0.5)
-    data = response.json()
-    print(f'{len(data)}')
-
-    for d in data:
-        id : int = int(d['ID'])
-        wins : int = int(d['wins'])
-        losses : int = int(d['losses'])
-        popeDB[id].wins = wins
-        popeDB[id].losses = losses
-
-    frame_file = 'assets/images/frame.png'
-    frame_offset = 98 # number of pixels in x & y in original scale that image portions starts
-    frame_height_percent = 0.6 # % of screen height frame's height should occupy
-    shadow_offset = 5
+    response = None
     try:
-        frame_img = pygame.image.load(frame_file).convert_alpha()
-        scale_factor = SCREEN_HEIGHT * frame_height_percent / frame_img.get_height()
-        scaled_size = (frame_img.get_width() * scale_factor, frame_img.get_height() * scale_factor)
-        frame_img = pygame.transform.smoothscale(frame_img, scaled_size)
-        frame_offset = frame_offset * scale_factor
-        img_size = (scaled_size[0] - 2 * frame_offset, scaled_size[1] - 2 * frame_offset)
+        # Set a timeout of 0.5 seconds (500 milliseconds)
+        response = requests.get(endpoint, timeout=0.5)
+        data = response.json()
+        # print(f'{len(data)}')
+        for d in data:
+            id : int = int(d['ID'])
+            wins : int = int(d['wins'])
+            losses : int = int(d['losses'])
+            popeDB[id].wins = wins
+            popeDB[id].losses = losses
 
-    except pygame.error as e:
-        print(f"Error loading image: {e}")
-        frame_img = None
+        frame_file = 'assets/images/frame.png'
+        frame_offset = 98 # number of pixels in x & y in original scale that image portions starts
+        frame_height_percent = 0.6 # % of screen height frame's height should occupy
+        shadow_offset = 5
+        try:
+            frame_img = pygame.image.load(frame_file).convert_alpha()
+            scale_factor = SCREEN_HEIGHT * frame_height_percent / frame_img.get_height()
+            scaled_size = (frame_img.get_width() * scale_factor, frame_img.get_height() * scale_factor)
+            frame_img = pygame.transform.smoothscale(frame_img, scaled_size)
+            frame_offset = frame_offset * scale_factor
+            img_size = (scaled_size[0] - 2 * frame_offset, scaled_size[1] - 2 * frame_offset)
 
-    while True:
-        #draw_bg(bg_image, is_game_started=False)
-        screen.blit(bg_image, (0,0))
-        button_width = 280
-        button_height = 60
-        exit_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                       NEXT_BUTTON_Y, button_width, button_height)
-        results_factor = 0.08
-        rotation_angle = 45
-        #winner_txt = gen_text_img('WINNER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), GREEN)
-        winner_txt = render_outlined_text('WINNER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), GREEN, BLACK, 2)
-        winner_txt = pygame.transform.rotate(winner_txt, rotation_angle)
-        #loser_txt = gen_text_img('LOSER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), RED)
-        loser_txt = render_outlined_text('LOSER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), RED, BLACK, 2)
-        loser_txt = pygame.transform.rotate(loser_txt, rotation_angle)
-        if frame_img is not None:
-            f1_x = SCREEN_WIDTH * 0.1
-            f1_y = SCREEN_HEIGHT * 0.2
-            f2_x = SCREEN_WIDTH * 0.9 - frame_img.get_width()
-            screen.blit(frame_img, (f1_x, f1_y))
-            screen.blit(frame_img, (f2_x, f1_y))
+        except pygame.error as e:
+            print(f"Error loading image: {e}")
+            frame_img = None
 
-        if winningPope is not None and winningPope.image is not None:
-            scaled_img = aspect_scale(winningPope.image, img_size)
-            sx = f1_x + (frame_img.get_width() - scaled_img.get_width()) / 2
-            sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
-            screen.blit(scaled_img, (sx,sy))
-            winner_rect = winner_txt.get_rect(center=(f1_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
-            screen.blit(winner_txt, winner_rect)
-            if winningPope.name is not None:
-                lpn_img = gen_text_img(winningPope.name, frame_font, BLACK)
-                lpn_x = f1_x + (frame_img.get_width() - lpn_img.get_width()) // 2
-                lpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - lpn_img.get_height()) // 2
-                screen.blit(lpn_img, (lpn_x, lpn_y))
-        if losingPope is not None and losingPope.image is not None:
-            scaled_img = aspect_scale(losingPope.image, img_size)
-            sx = f2_x + (frame_img.get_width() - scaled_img.get_width()) / 2
-            sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
-            screen.blit(scaled_img, (sx,sy))
-            dim_overlay = pygame.Surface(scaled_img.get_size(), pygame.SRCALPHA)
-            dim_overlay.fill((0, 0, 0, 128)) 
-            screen.blit(dim_overlay, (sx,sy))
-            loser_rect = winner_txt.get_rect(center=(f2_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
-            screen.blit(loser_txt, loser_rect)
-            if losingPope.name is not None:
-                rpn_img = gen_text_img(losingPope.name, frame_font, BLACK)
-                rpn_x = f2_x + (frame_img.get_width() - rpn_img.get_width()) // 2
-                rpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - rpn_img.get_height()) // 2
-                screen.blit(rpn_img, (rpn_x, rpn_y))
-            
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if exit_button.collidepoint(event.pos):
-                    return
-                pass
-            elif event.type == pygame.JOYBUTTONDOWN:
-                if event.button == START_BUTTON:
-                    return
+        while True:
+            #draw_bg(bg_image, is_game_started=False)
+            screen.blit(bg_image, (0,0))
+            button_width = 280
+            button_height = 60
+            exit_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+                                        NEXT_BUTTON_Y, button_width, button_height)
+            results_factor = 0.08
+            rotation_angle = 45
+            #winner_txt = gen_text_img('WINNER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), GREEN)
+            winner_txt = render_outlined_text('WINNER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), GREEN, BLACK, 2)
+            winner_txt = pygame.transform.rotate(winner_txt, rotation_angle)
+            #loser_txt = gen_text_img('LOSER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), RED)
+            loser_txt = render_outlined_text('LOSER', pygame.font.Font(font_name, int(SCREEN_HEIGHT * results_factor)), RED, BLACK, 2)
+            loser_txt = pygame.transform.rotate(loser_txt, rotation_angle)
+            if frame_img is not None:
+                f1_x = SCREEN_WIDTH * 0.1
+                f1_y = SCREEN_HEIGHT * 0.2
+                f2_x = SCREEN_WIDTH * 0.9 - frame_img.get_width()
+                screen.blit(frame_img, (f1_x, f1_y))
+                screen.blit(frame_img, (f2_x, f1_y))
 
-        pygame.display.update()
-        clock.tick(FPS)
+            if winningPope is not None and winningPope.image is not None:
+                scaled_img = aspect_scale(winningPope.image, img_size)
+                sx = f1_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+                sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
+                screen.blit(scaled_img, (sx,sy))
+                winner_rect = winner_txt.get_rect(center=(f1_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
+                screen.blit(winner_txt, winner_rect)
+                if winningPope.name is not None:
+                    lpn_img = gen_text_img(winningPope.name, frame_font, BLACK)
+                    lpn_x = f1_x + (frame_img.get_width() - lpn_img.get_width()) // 2
+                    lpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - lpn_img.get_height()) // 2
+                    screen.blit(lpn_img, (lpn_x, lpn_y))
+            if losingPope is not None and losingPope.image is not None:
+                scaled_img = aspect_scale(losingPope.image, img_size)
+                sx = f2_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+                sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
+                screen.blit(scaled_img, (sx,sy))
+                dim_overlay = pygame.Surface(scaled_img.get_size(), pygame.SRCALPHA)
+                dim_overlay.fill((0, 0, 0, 128)) 
+                screen.blit(dim_overlay, (sx,sy))
+                loser_rect = winner_txt.get_rect(center=(f2_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
+                screen.blit(loser_txt, loser_rect)
+                if losingPope.name is not None:
+                    rpn_img = gen_text_img(losingPope.name, frame_font, BLACK)
+                    rpn_x = f2_x + (frame_img.get_width() - rpn_img.get_width()) // 2
+                    rpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - rpn_img.get_height()) // 2
+                    screen.blit(rpn_img, (rpn_x, rpn_y))
+                
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if exit_button.collidepoint(event.pos):
+                        return
+                    pass
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == START_BUTTON:
+                        return
 
-    return
+            pygame.display.update()
+            clock.tick(FPS)
+    except requests.exceptions.Timeout:
+        print("record_result(): The request timed out after 500 milliseconds.")
+        response = None
+    except requests.exceptions.RequestException as e:
+        print(f"record_result(): An error occurred: {e}")
+        response = None
 
 def configure_joysticks():
     num_joysticks = 2 # number needed to proceed
