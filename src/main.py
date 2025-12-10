@@ -792,6 +792,7 @@ def configure_joysticks():
     global left_joystick
     global right_joystick
     START_BUTTON = 9
+    keyboard_only = False
 
     # wait for required number of joysticks to be plugged in
     running = True
@@ -800,6 +801,18 @@ def configure_joysticks():
             if event.type == pygame.QUIT:
                 running = False
                 exit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                screen.fill(WHITE) 
+                text = 'Skipping joystick config - keyboard only'
+                text_img = menu_font.render(text, True, (0,0,0))
+                textbox = text_img.get_rect()
+                textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+                screen.blit(text_img, textbox)
+                pygame.display.update()
+                pygame.time.delay(2000)
+                keyboard_only = True
+                running = False
+
             # Handle joystick connection
             elif event.type == pygame.JOYDEVICEADDED:
                 # Get the device index from the event
@@ -843,7 +856,7 @@ def configure_joysticks():
 
     # wait for required number of joysticks to be plugged in
     running = True
-    while running:
+    while not keyboard_only and running:
         # Fill the screen with a color (e.g., blue)
         screen.fill(WHITE) 
 
