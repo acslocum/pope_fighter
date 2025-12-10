@@ -978,10 +978,12 @@ def game_loop():
 configure_joysticks()
 while True:
     if game_debug:
-        winner, loser = game_loop()
-        record_result(winner, loser)
+        menu_selection = main_menu()
+        #winner, loser = game_loop()
+        #record_result(winner, loser)
 
-        scores_screen(winner, loser)
+        #scores_screen(winner, loser)
+        scores_screen(2,1)
         exit()
     else:
         menu_selection = main_menu()
@@ -990,5 +992,3 @@ while True:
             winner, loser = game_loop()
             record_result(winner, loser)
             scores_screen(winner, loser)
-        elif menu_selection == "SCORES":
-            scores_screen()
