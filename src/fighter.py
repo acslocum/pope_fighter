@@ -308,11 +308,22 @@ class Fighter:
                     #print(f'Hit! dmg done: {dmg} from {dmg_rng}')
                     target.health -= dmg
                     target.hit = True
+                    target.play_hit_effect()
                     if target.health <= 0:
                         self.victory = True
                 else:
                     #print('No hit')
                     pass
+
+    def play_hit_effect(self):
+        if self.attack_sound is not None:
+                effect = self.attack_sound.getRandEffect('hit')
+                if effect is not None:
+                    channel = effect.play()
+                    if self.player == 1:
+                        channel.set_volume(1.0, 0.0)
+                    elif self.player == 2:
+                        channel.set_volume(0.0, 1.0)
 
     def update_action(self, new_action):
         # check if the new action is different to the previous one
