@@ -8,6 +8,7 @@ import os
 import random
 import re
 import requests
+import threading
 import sys
 from audio_loader import GameSounds
 from fighter import Fighter
@@ -1062,7 +1063,9 @@ def game_loop():
 
             if not fighter_1.alive or not fighter_2.alive:
                 if not smoke_released:
-                    fog_machine.produceSmoke(smoke_time_ms)
+                    t = threading.Thread(target=fog_machine.produceSmoke, args=(smoke_time_ms,))
+                    t.start()
+                    #fog_machine.produceSmoke(smoke_time_ms)
                     smoke_released = True
 
             if not fighter_2.alive:
