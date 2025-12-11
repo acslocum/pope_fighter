@@ -793,15 +793,16 @@ def record_result(winner, loser):
     response = None
     # Set a timeout of 0.5 seconds (500 milliseconds)
     response = get_data_from_server(endpoint)
-    data = response.json()
-    # print(f'{len(data)}')
-    if data is not None: 
-        for d in data:
-            id : int = int(d['ID'])
-            wins : int = int(d['wins'])
-            losses : int = int(d['losses'])
-            popeDB[id].wins = wins
-            popeDB[id].losses = losses
+    if response is not None:
+        data = response.json()
+        # print(f'{len(data)}')
+        if data is not None: 
+            for d in data:
+                id : int = int(d['ID'])
+                wins : int = int(d['wins'])
+                losses : int = int(d['losses'])
+                popeDB[id].wins = wins
+                popeDB[id].losses = losses
 
     frame_file = 'assets/images/frame.png'
     frame_offset = 98 # number of pixels in x & y in original scale that image portions starts
