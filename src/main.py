@@ -1030,8 +1030,13 @@ def game_loop():
         p1_name = left_pope.name if left_pope is not None else 'Pope Testus I'
         p2_name = right_pope.name if right_pope is not None else 'Pope Beta IV'
 
-        draw_text(f"{p1_name}", score_font, WHITE, 20, 20)
-        draw_text(f"{p2_name}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
+        #draw_text(f"{p1_name}", score_font, WHITE, 20, 20)
+        #draw_text(f"{p2_name}", score_font, WHITE, SCREEN_WIDTH - 220, 20)
+        p1_img = render_outlined_text(p1_name, score_font, WHITE, BLACK, 1)
+        p2_img = render_outlined_text(p2_name, score_font, WHITE, BLACK, 1)
+        screen.blit(p1_img, (20,20))
+        screen.blit(p2_img, (SCREEN_WIDTH - 20 - p2_img.get_width(), 20))
+
         fighter_1.draw_health_bar(screen, pygame.Rect(20,50,200,20),False)
         fighter_2.draw_health_bar(screen, pygame.Rect(SCREEN_WIDTH-220,50,200,20), True)
 
