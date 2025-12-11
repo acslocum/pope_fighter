@@ -971,7 +971,19 @@ def configure_joysticks():
     while not keyboard_only and running:
         # Fill the screen with a color (e.g., blue)
         screen.fill(WHITE) 
-
+        if fog_machine is None:
+            text = f'No fog machine found'
+            text_img = high_scores_font.render(text, True, (0,0,0))
+            textbox = text_img.get_rect()
+            textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.2)
+            screen.blit(text_img, textbox)
+        else:
+            text = f'Fog machine found: {fog_machine.port_name}'
+            text_img = high_scores_font.render(text, True, (0,0,0))
+            textbox = text_img.get_rect()
+            textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.2)
+            screen.blit(text_img, textbox)
+            
         if len(joysticks) < num_joysticks:
             text = 'This should never happen'
         else:
