@@ -15,20 +15,21 @@ class FogMachine():
 
     def closeRelay(self, on : bool):
         if isinstance(on, bool) and self.serial is not None:
+            delay = 0.02
             bytes_written = 0
             while bytes_written != 4:
                 try:
-                    if not self.serial.is_open():
+                    if not self.serial.is_open:
                         self.serial.open()
-                        time.sleep(0.05)
+                        time.sleep(delay)
                     if on:
-                        print("Turning on")
+                        #print("Turning on")
                         bytes_written = self.serial.write(self.on_bytes)
-                        time.sleep(0.05)
+                        time.sleep(delay)
                     else:
-                        print('Turning off')
+                        #print('Turning off')
                         bytes_written = self.serial.write(self.off_bytes)
-                        time.sleep(0.05)
+                        time.sleep(delay)
                     self.serial.close()
                 except Exception as e:
                     bytes_written = 0
