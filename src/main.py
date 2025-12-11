@@ -86,7 +86,7 @@ popeWinEndpoint = popeServerBaseURL + 'win/' # add 'popeid'
 popeLoseEndpoint = popeServerBaseURL + 'lose/' # add 'popeid'
 gameOverEndpoint = popeServerBaseURL + 'game/' # add 'winnerID/loserID'
 scoreboardEndpoint = popeServerBaseURL + 'scoreboard/' # add 'winnerID/loserID'
-hallOfFame = popeServerBaseURL + 'hallOfFame/' # add 'winnerID/loserID'
+hallOfFameEndpoint = popeServerBaseURL + 'hallOfFame/' # add 'winnerID/loserID'
 
 left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
@@ -233,7 +233,7 @@ def draw_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pyga
     col_widths = [0] * len(data[0])
     #print(f'col_widths: {col_widths}')
     for row in range(len(data)):
-        #print(f'data_row: {data_row}')
+        #print(f'data_row: {row}')
         cell_row : list[pygame.Surface] = []
         for col in range(len(data[row])):
             if wl_rows is not None and row in wl_rows:
@@ -503,6 +503,92 @@ def main_menu():
 
         pygame.display.update()
         clock.tick(FPS)
+
+def hall_of_fame_screen():
+    START_BUTTON = 9
+    endpoint = f'{hallOfFameEndpoint}'
+
+    response = get_data_from_server(endpoint)
+    data = None
+    if response is not None:
+        data = response.json()
+    table_data = build_HOF_rows(data)
+    #print(table_data)
+    # if game_debug:
+    #     while len(table_data) < 13:
+    #         table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
+    tbl_surf = draw_table(table_data, None)
+    
+    while True:
+        screen.blit(bg_image, (0,0))
+        dim_overlay(screen)
+
+        scores_title = "HALL OF FAME"
+        scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
+        screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
+        #draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
+        screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, 0.1 * SCREEN_HEIGHT ) )
+
+        button_width = 280
+        button_height = 60
+        return_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+                                    NEXT_BUTTON_Y, button_width, button_height)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if return_button.collidepoint(event.pos):
+                    return
+                pass
+            elif event.type == pygame.JOYBUTTONDOWN:
+                if event.button == START_BUTTON:
+                    return
+
+        pygame.display.update()
+        clock.tick(FPS)
+
+def build_HOF_rows(data):
+    # print(data)
+    table_data = [ ['Name', 'Upgrades'] ]# will be an array of arrays, first array is the header
+    line_num = 1 # header row is line 0
+    if data is not None:
+        for pope in data:
+            print(pope)
+            name = pope['name']
+            table_data.append([name,canonization(pope)])
+            line_num += 1
+    return table_data
+
+def canonization(pope):
+    level = 0
+    upgrades = ''
+    value = ''
+    if pope['holiness'] >= 10:
+        level += 1
+        upgrades = upgrades + ' HOL'
+    if pope['miracles'] >= 10:
+        level += 1
+        upgrades = upgrades + ' MIR'
+    if pope['wisdom'] >= 10:
+        level += 1
+        upgrades = upgrades + ' WIS'
+    if pope['legacy'] >= 10:
+        level += 1
+        upgrades = upgrades + ' LEG'
+    match level:
+        case 1:
+            value = 'Patriarch of the West'
+        case 2:
+            value = 'Bishop of Rome'
+        case 3:
+            value = 'Vicar of Jesus Christ'
+        case 4:
+            value = 'Supreme Pontiff'
+        case _:
+            return ''
+    return f'{value} {upgrades}'
 
 
 def scores_screen(winner, loser):
@@ -993,6 +1079,7 @@ while True:
         record_result(2,1)
         #scores_screen(winner, loser)
         scores_screen(2,1)
+        hall_of_fame_screen()
         exit()
     else:
         menu_selection = main_menu()
@@ -1001,5 +1088,6 @@ while True:
             winner, loser = game_loop()
             record_result(winner, loser)
             scores_screen(winner, loser)
+            hall_of_fame_screen()
             left_pope = None
             right_pope = None
