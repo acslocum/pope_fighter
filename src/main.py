@@ -13,6 +13,7 @@ from audio_loader import GameSounds
 from fighter import Fighter
 import db_parser
 from PopeData import PopeData
+from fog_machine import *
 
 # Helper Function for Bundled Assets
 def resource_path(relative_path):
@@ -100,9 +101,11 @@ if game_debug:
     left_pope = popeDB[1]
     right_pope = popeDB[2]
 
-# Game Variables
-score = [0, 0]  # Player Scores: [P1, P2]
-
+# Check for fog machine
+fog_machine = None
+fm_port = find_ch340_device()
+if fm_port is not None:
+    fog_machine = FogMachine(fm_port)
 
 def draw_text(text, font, color, x, y):
     img = font.render(text, True, color)
@@ -899,7 +902,7 @@ def configure_joysticks():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 screen.fill(WHITE) 
                 text = 'Skipping joystick config - keyboard only'
-                text_img = menu_font.render(text, True, (0,0,0))
+                text_img = high_scores_font.render(text, True, (0,0,0))
                 textbox = text_img.get_rect()
                 textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
                 screen.blit(text_img, textbox)
@@ -933,6 +936,18 @@ def configure_joysticks():
 
         # Fill the screen with a color (e.g., blue)
         screen.fill(WHITE) 
+        if fog_machine is None:
+            text = f'No fog machine found'
+            text_img = high_scores_font.render(text, True, (0,0,0))
+            textbox = text_img.get_rect()
+            textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.2)
+            screen.blit(text_img, textbox)
+        else:
+            text = f'Fog machine found: {fog_machine.port_name}'
+            text_img = high_scores_font.render(text, True, (0,0,0))
+            textbox = text_img.get_rect()
+            textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.2)
+            screen.blit(text_img, textbox)
 
         if len(joysticks) < num_joysticks:
             if (num_joysticks - len(joysticks)) > 1:
@@ -941,7 +956,7 @@ def configure_joysticks():
                 j_str = 'joystick'
             text = f'Plug in {num_joysticks - len(joysticks)} {j_str}'
             text = text.upper()
-            text_img = menu_font.render(text, True, (0,0,0))
+            text_img = high_scores_font.render(text, True, (0,0,0))
             textbox = text_img.get_rect()
             textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
             screen.blit(text_img, textbox)
@@ -961,7 +976,7 @@ def configure_joysticks():
             text = 'Press the START button on left joystick'
 
         text = text.upper()
-        text_img = menu_font.render(text, True, (0,0,0))
+        text_img = high_scores_font.render(text, True, (0,0,0))
         textbox = text_img.get_rect()
         textbox.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         screen.blit(text_img, textbox)
@@ -1004,6 +1019,8 @@ def game_loop():
     winnerID : int = None
     loserID : int = None
     exit_button = None
+    smoke_released = False
+    smoke_time_ms = 1000
 
     while True:
         #draw_bg(bg_image, is_game_started=game_started)
@@ -1024,7 +1041,11 @@ def game_loop():
             fighter_1.update()
             fighter_2.update()
 
-            if not fighter_1.alive:
+            if not fighter_1.alive or not fighter_2.alive:
+                if not smoke_released:
+                    fog_machine.produceSmoke(smoke_time_ms)
+                    smoke_released = True
+
                 winner_img = left_pope.image 
                 winnerID = left_pope.id
                 loserID = right_pope.id
