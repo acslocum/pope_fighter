@@ -86,6 +86,7 @@ popeWinEndpoint = popeServerBaseURL + 'win/' # add 'popeid'
 popeLoseEndpoint = popeServerBaseURL + 'lose/' # add 'popeid'
 gameOverEndpoint = popeServerBaseURL + 'game/' # add 'winnerID/loserID'
 scoreboardEndpoint = popeServerBaseURL + 'scoreboard/' # add 'winnerID/loserID'
+hallOfFame = popeServerBaseURL + 'hallOfFame/' # add 'winnerID/loserID'
 
 left_pope : db_parser.PopeData = None
 right_pope: db_parser.PopeData = None
@@ -509,78 +510,79 @@ def scores_screen(winner, loser):
     START_BUTTON = 9
     endpoint = f'{scoreboardEndpoint}{str(count)}/{winner}/{loser}'
     print(f'Sending end game: {endpoint}')
-    response = None
-    try:
-        response = get_data_from_server(endpoint)
-        table_data = [ ['Rank', 'Name', 'Record'] ]# will be an array of arrays, first array is the header
-        line_num = 1 # header row is line 0
-        winningPope = popeDB[winner]
-        losingPope = popeDB[loser]
-        winner_line = None
-        loser_line = None
+
+    response = get_data_from_server(endpoint)
+    winningPope = popeDB[winner]
+    losingPope = popeDB[loser]
+    data = None
+    if response is not None:
         data = response.json()
-        if data is not None:
-            for key in data:
-                line = [str(int(key) + 1)]
-                name = data[key]['name']
-                if name == winningPope.name:
-                    winner_line = line_num
-                elif name == losingPope.name:
-                    loser_line = line_num
-                wins = data[key]['wins']
-                losses = data[key]['losses']
-                line.append(str(name))
-                line.append(f'{str(wins)} - {str(losses)}')
-                table_data.append(line)
-                line_num += 1
-        #print(table_data)
-        # if game_debug:
-        #     while len(table_data) < 13:
-        #         table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
-        if winner_line is not None and loser_line is not None:
-            wl_rows = (winner_line, loser_line)
-        else:
-            wl_rows = None
-        tbl_surf = draw_table(table_data, wl_rows)
-        
-        while True:
-            #draw_bg(bg_image)
-            screen.blit(bg_image, (0,0))
-            dim_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-            dim_overlay.fill((0, 0, 0, 128)) 
-            screen.blit(dim_overlay, (0,0))
+    (table_data, winner_line, loser_line) = build_highscore_rows(data, winningPope, losingPope)
+    #print(table_data)
+    # if game_debug:
+    #     while len(table_data) < 13:
+    #         table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
+    if winner_line is not None and loser_line is not None:
+        wl_rows = (winner_line, loser_line)
+    else:
+        wl_rows = None
+    tbl_surf = draw_table(table_data, wl_rows)
+    
+    while True:
+        screen.blit(bg_image, (0,0))
+        dim_overlay(screen)
 
-            scores_title = "HIGH SCORES"
-            scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
-            screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
-            #draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
-            screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, 0.1 * SCREEN_HEIGHT ) )
+        scores_title = "HIGH SCORES"
+        scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
+        screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
+        #draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
+        screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, 0.1 * SCREEN_HEIGHT ) )
 
-            button_width = 280
-            button_height = 60
-            return_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                        NEXT_BUTTON_Y, button_width, button_height)
+        button_width = 280
+        button_height = 60
+        return_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+                                    NEXT_BUTTON_Y, button_width, button_height)
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if return_button.collidepoint(event.pos):
-                        return
-                    pass
-                elif event.type == pygame.JOYBUTTONDOWN:
-                    if event.button == START_BUTTON:
-                        return
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if return_button.collidepoint(event.pos):
+                    return
+                pass
+            elif event.type == pygame.JOYBUTTONDOWN:
+                if event.button == START_BUTTON:
+                    return
 
-            pygame.display.update()
-            clock.tick(FPS)
-    except requests.exceptions.Timeout:
-        print("scores_screen(): The request timed out after 500 milliseconds.")
-        response = None
-    except requests.exceptions.RequestException as e:
-        print(f"scores_screen(): An error occurred: {e}")
-        response = None
+        pygame.display.update()
+        clock.tick(FPS)
+
+def build_highscore_rows(data, winningPope, losingPope):
+    table_data = [ ['Rank', 'Name', 'Record'] ]# will be an array of arrays, first array is the header
+    line_num = 1 # header row is line 0
+    winner_line = None
+    loser_line = None
+    if data is not None:
+        for key in data:
+            line = [str(int(key) + 1)]
+            name = data[key]['name']
+            if name == winningPope.name:
+                winner_line = line_num
+            elif name == losingPope.name:
+                loser_line = line_num
+            wins = data[key]['wins']
+            losses = data[key]['losses']
+            line.append(str(name))
+            line.append(f'{str(wins)} - {str(losses)}')
+            table_data.append(line)
+            line_num += 1
+    return (table_data, winner_line, loser_line)
+
+def dim_overlay(screen):
+    dim_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+    dim_overlay.fill((0, 0, 0, 128)) 
+    screen.blit(dim_overlay, (0,0))    
 
 def get_data_from_server(endpoint):
     for i in range(4): #tries 4 times to hit the server before giving up
