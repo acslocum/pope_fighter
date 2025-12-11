@@ -432,10 +432,12 @@ def main_menu():
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.collidepoint(event.pos):
+                    previousMatch = [left_pope.id, right_pope.id]
                     return "START"
             elif start_button is not None and event.type == pygame.JOYBUTTONDOWN:
                 if event.button == START_BUTTON:
-                    return
+                    previousMatch = [left_pope.id, right_pope.id]
+                    return "START"
             elif event.type == pygame.KEYDOWN:
                 #print(len(pygame.key.name(event.key)))
                 #scanned += event.unicode.upper()
@@ -498,7 +500,6 @@ def main_menu():
                             # check to see if we have two popes
                             if left_pope and right_pope:
                                 print(f'We\'ve got a match {left_pope.name} vs. {right_pope.name}')
-                                previousMatch = [left_pope.id, right_pope.id]
                                 #return "START"
                     
                         # reset for next scan
