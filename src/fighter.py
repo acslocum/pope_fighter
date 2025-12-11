@@ -286,12 +286,12 @@ class Fighter:
                 # need to calculate whether hit occurs, and if so
                 # how much dmg is done based on player stats
                 #  - miracles -> defense rating (chance to block dmg)
-                #      default value of 6 -> 30% chance to block, +/- 5% per step off from 6
+                #      default value of 6 -> 15% chance to block, +/- 5% per step off from 6
                 #  - wisdom   -> crit rating (chance to crit)
                 #      default value of 6 -> 30% chance to crit, +/- 5% per step off from 6
                 #  - legacy   -> attack power (amount of dmg done per hit)
                 #       dmg per hit will be +/- 2 of your legacy value (i.e. legacy = 6 can do 4-8 dmg)
-                block_pct = 0.3 + 0.05 * (target.miracles - self.averageStat)
+                block_pct = 0.1 + 0.03 * (target.miracles - self.averageStat)
                 block_roll = random.uniform(0.0, 1.0)
                 block = True if block_roll <= block_pct else False
                 #print(f'block% {block_pct:.2f}, block roll {block_roll:.4f}, block? {block}')
