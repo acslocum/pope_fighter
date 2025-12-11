@@ -35,6 +35,12 @@ class FogMachine():
                     bytes_written = 0
                     print(f'Got exception: {e}')
 
+    def produceSmoke(self, dur_ms : int = 1000):
+        self.closeRelay(True)
+        time.sleep(dur_ms / 1000)
+        self.closeRelay(False)
+        
+
 def find_ch340_device() -> str:
     """
     Finds and prints information about connected CH340 devices.
