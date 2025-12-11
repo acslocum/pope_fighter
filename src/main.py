@@ -395,7 +395,7 @@ def main_menu():
             clear_button_x = SCREEN_WIDTH * 0.9 - frame_img.get_width() + (frame_img.get_width() - button_width) // 2
             clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
             clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
-            start_button = draw_button("START GAME", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
+            start_button = draw_button("START", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
                                        NEXT_BUTTON_Y, button_width, button_height)
         else:
             # need to scan first pope
