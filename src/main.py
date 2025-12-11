@@ -1052,10 +1052,11 @@ def game_loop():
                     fog_machine.produceSmoke(smoke_time_ms)
                     smoke_released = True
 
+            if not fighter_2.alive:
                 winner_img = left_pope.image 
                 winnerID = left_pope.id
                 loserID = right_pope.id
-            elif not fighter_2.alive:
+            elif not fighter_1.alive:
                 winner_img = right_pope.image
                 winnerID = right_pope.id
                 loserID = left_pope.id
