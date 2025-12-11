@@ -557,11 +557,11 @@ def build_HOF_rows(data):
         for pope in data:
             print(pope)
             name = pope['name']
-            table_data.append([name,canonization(pope)])
+            table_data.append([name,honorific_title(pope)])
             line_num += 1
     return table_data
 
-def canonization(pope):
+def honorific_title(pope):
     level = 0
     upgrades = ''
     value = ''
