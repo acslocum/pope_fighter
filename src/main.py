@@ -1060,7 +1060,7 @@ def game_loop():
             fighter_2.update()
 
             if not fighter_1.alive or not fighter_2.alive:
-                if not smoke_released:
+                if fog_machine is not None and not smoke_released:
                     t = threading.Thread(target=fog_machine.produceSmoke, args=(smoke_time_ms,))
                     t.start()
                     #fog_machine.produceSmoke(smoke_time_ms)
