@@ -2,8 +2,8 @@ import math
 import pygame
 from pygame import mixer
 from pygame import font
-import cv2
-import numpy as np
+#import cv2
+#import numpy as np
 import os
 import random
 import re
@@ -39,7 +39,7 @@ NEXT_BUTTON_Y = SCREEN_HEIGHT * 0.8 # set a consistent height for the 'Next' but
 FPS = 60
 ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
-game_debug = True
+game_debug = False
 # game_debug = True
 
 # Colors
@@ -1062,7 +1062,7 @@ def game_loop():
             fighter_2.update()
 
             if not fighter_1.alive or not fighter_2.alive:
-                if not smoke_released:
+                if fog_machine is not None and not smoke_released:
                     t = threading.Thread(target=fog_machine.produceSmoke, args=(smoke_time_ms,))
                     t.start()
                     #fog_machine.produceSmoke(smoke_time_ms)
