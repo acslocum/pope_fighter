@@ -2,8 +2,6 @@ import math
 import pygame
 from pygame import mixer
 from pygame import font
-import cv2
-import numpy as np
 import os
 import random
 import re
