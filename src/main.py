@@ -1110,7 +1110,8 @@ def game_loop():
             if exit_button is not None:
                 if event.type == pygame.MOUSEBUTTONDOWN and exit_button.collidepoint(event.pos):
                     return winnerID, loserID
-                elif event.type == pygame.JOYBUTTONDOWN and event.button == START_BUTTON:
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    print(f"Joystick {event.joy}: Button {event.button} pressed")
                     return winnerID, loserID
 
         pygame.display.update()
