@@ -593,9 +593,11 @@ def hall_of_fame_screen():
     # if game_debug:
     #     while len(table_data) < 13:
     #         table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
+    table_surfaces = []
     text_color = GREEN
-    [tbl_surf_left, text_color] = draw_hof_table(table_data[0:hof_table_length], text_color)
-    [tbl_surf_right, text_color] = draw_hof_table(table_data[hof_table_length:], text_color)
+    for i in range(0,len(table_data),hof_table_length):
+        [tbl_surf, text_color] = draw_hof_table(table_data[i:(i+hof_table_length)], text_color)
+        table_surfaces.append(tbl_surf)
     
     time = pygame.time.get_ticks()
     while True:
@@ -607,9 +609,10 @@ def hall_of_fame_screen():
         #screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
         draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
         table_top_edge = 50 + menu_font_title.size(scores_title)[1] + 20
-        table_left_edge = 20 #(10 + tbl_surf.get_width()) // 2
-        screen.blit(tbl_surf_left, (table_left_edge, table_top_edge ) )
-        screen.blit(tbl_surf_right, (table_left_edge + SCREEN_WIDTH // 2, table_top_edge ) )
+        table_left_pad = 20 #(10 + tbl_surf.get_width()) // 2
+        left_edge = [20,20+table_surfaces[0].get_width(),40+table_surfaces[0].get_width()*2]
+        for i in range(len(table_surfaces)):
+            screen.blit(table_surfaces[i], (left_edge[i], table_top_edge ) )
 
         button_width = 280
         button_height = 60
