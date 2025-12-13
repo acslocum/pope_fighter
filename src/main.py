@@ -282,7 +282,22 @@ def draw_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pyga
 
     return table_surface
 
-def draw_hof_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pygame.Surface:
+def get_hof_color(row, current_color):
+    if row[0].startswith('Patriarch'):
+        return WHITE
+    elif row[0].startswith('Bishop'):
+        return GREEN
+    elif row[0].startswith('Vicar'):
+        return RED
+    elif row[0].startswith('Supreme'):
+        return (237,220,26)
+    else:
+        return current_color
+    
+#(237,220,26)
+#(44,234,26)
+
+def draw_hof_table(data : list[list[str]], text_color):
     #font_size = 60
     #font = pygame.font.Font(font_name, font_size)  # Increased size for scores
     font = hall_of_fame_font
@@ -298,15 +313,10 @@ def draw_hof_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> 
     #print(f'col_widths: {col_widths}')
     for row in range(row_count):
         #print(f'data_row: {row}')
+        text_color = get_hof_color(data[row], text_color)
         cell_row : list[pygame.Surface] = []
         for col in range(len(data[row])):
-            if wl_rows is not None and row in wl_rows:
-                if row == wl_rows[0]:
-                    text_surface = render_outlined_text(data[row][col], font, (44,234,26), (131,131,131), outline_width)
-                elif row == wl_rows[1]:
-                    text_surface = render_outlined_text(data[row][col], font, (255, 78, 36), (131,131,131), outline_width)
-            else:
-                text_surface = render_outlined_text(data[row][col], font, (237,220,26), (130,95,8), outline_width)
+            text_surface = render_outlined_text(data[row][col], font, text_color, (130,95,8), outline_width)
             if text_surface.get_width() > col_widths[col]:
                 col_widths[col] = text_surface.get_width()
             if text_surface.get_height() > row_height:
@@ -338,7 +348,7 @@ def draw_hof_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> 
             y = row_height * row + v_pad * row
             table_surface.blit(cell_images[row][col], (x,y))
 
-    return table_surface
+    return [table_surface, text_color]
 
 
 def draw_error_msg(msg : str, timeout = 3000):
@@ -583,8 +593,9 @@ def hall_of_fame_screen():
     # if game_debug:
     #     while len(table_data) < 13:
     #         table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
-    tbl_surf_left = draw_hof_table(table_data[0:hof_table_length], None)
-    tbl_surf_right = draw_hof_table(table_data[hof_table_length:], None)
+    text_color = GREEN
+    [tbl_surf_left, text_color] = draw_hof_table(table_data[0:hof_table_length], text_color)
+    [tbl_surf_right, text_color] = draw_hof_table(table_data[hof_table_length:], text_color)
     
     time = pygame.time.get_ticks()
     while True:
@@ -624,17 +635,35 @@ def hall_of_fame_screen():
 
 def build_HOF_rows(data):
     # print(data)
+    group = 5
     table_data = []# will be an array of arrays, no header
-    line_num = 1 # header row is line 0
     if data is not None:
-        for pope in data:
-            print(pope)
+        for i in range(len(data)):
+            #print(pope)
+            pope = data[i]
             name = pope['name']
-            table_data.append([name,honorific_title(pope)])
-            line_num += 1
+            #print(name)
+            upgrade_info = upgrades(pope)
+            if upgrade_info[1] < group:
+                #print(f'{group} {upgrade_info[1]} {i}')
+                add_honorifics(table_data,upgrade_info[1])
+                group = upgrade_info[1]
+            table_data.append([name,upgrade_info[0]])
     return table_data
 
-def honorific_title(pope):
+def add_honorifics(table_data, upgrade_level):
+    match upgrade_level:
+        case 1:
+            value = 'Patriarch of the West'
+        case 2:
+            value = 'Bishop of Rome'
+        case 3:
+            value = 'Vicar of Jesus Christ'
+        case 4:
+            value = 'Supreme Pontiff'
+    table_data.append([value,''])
+
+def upgrades(pope):
     level = 0
     upgrades = ''
     value = ''
@@ -650,18 +679,7 @@ def honorific_title(pope):
     if pope['legacy'] >= 10:
         level += 1
         upgrades = upgrades + ' LEG'
-    match level:
-        case 1:
-            value = 'Patriarch of the West'
-        case 2:
-            value = 'Bishop of Rome'
-        case 3:
-            value = 'Vicar of Jesus Christ'
-        case 4:
-            value = 'Supreme Pontiff'
-        case _:
-            return ''
-    return f'{value} {upgrades}'
+    return [f'{upgrades}',level]
 
 
 def scores_screen(winner, loser):
