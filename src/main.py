@@ -609,27 +609,19 @@ def hall_of_fame_screen():
         #screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
         draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
         table_top_edge = 50 + menu_font_title.size(scores_title)[1] + 20
-        table_left_pad = 20 #(10 + tbl_surf.get_width()) // 2
         left_edge = [20,20+table_surfaces[0].get_width(),40+table_surfaces[0].get_width()*2]
-        for i in range(len(table_surfaces)):
+        columns = min(3,len(table_surfaces))
+        for i in range(columns):
             screen.blit(table_surfaces[i], (left_edge[i], table_top_edge ) )
-
-        button_width = 280
-        button_height = 60
-        return_button = draw_button("Next", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
-                                    NEXT_BUTTON_Y, button_width, button_height)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if return_button.collidepoint(event.pos):
-                    return
-                pass
+                return
             elif event.type == pygame.JOYBUTTONDOWN:
-                if event.button == START_BUTTON:
-                    return
+                return
         if timed_ending_screens and (pygame.time.get_ticks() - time > end_screen_wait):
             return
 
