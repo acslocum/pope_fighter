@@ -39,6 +39,8 @@ ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
 game_debug = True
 # game_debug = True
+timed_ending_screens = True
+end_screen_wait = 5 * 1000
 
 # Colors
 RED = (255, 0, 0)
@@ -522,6 +524,7 @@ def hall_of_fame_screen():
     #         table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
     tbl_surf = draw_table(table_data, None)
     
+    time = pygame.time.get_ticks()
     while True:
         screen.blit(bg_image, (0,0))
         dim_overlay(screen)
@@ -548,6 +551,8 @@ def hall_of_fame_screen():
             elif event.type == pygame.JOYBUTTONDOWN:
                 if event.button == START_BUTTON:
                     return
+        if timed_ending_screens and (pygame.time.get_ticks() - time > end_screen_wait):
+            return
 
         pygame.display.update()
         clock.tick(FPS)
@@ -617,6 +622,7 @@ def scores_screen(winner, loser):
         wl_rows = None
     tbl_surf = draw_table(table_data, wl_rows)
     
+    time = pygame.time.get_ticks()
     while True:
         screen.blit(bg_image, (0,0))
         dim_overlay(screen)
@@ -643,6 +649,9 @@ def scores_screen(winner, loser):
             elif event.type == pygame.JOYBUTTONDOWN:
                 if event.button == START_BUTTON:
                     return
+        if timed_ending_screens and (pygame.time.get_ticks() - time > end_screen_wait):
+            return
+
 
         pygame.display.update()
         clock.tick(FPS)
@@ -820,6 +829,7 @@ def record_result(winner, loser):
         print(f"Error loading image: {e}")
         frame_img = None
 
+    time = pygame.time.get_ticks()
     while True:
         #draw_bg(bg_image, is_game_started=False)
         screen.blit(bg_image, (0,0))
@@ -881,6 +891,8 @@ def record_result(winner, loser):
             elif event.type == pygame.JOYBUTTONDOWN:
                 if event.button == START_BUTTON:
                     return
+        if timed_ending_screens and (pygame.time.get_ticks() - time > end_screen_wait):
+            return
 
         pygame.display.update()
         clock.tick(FPS)
