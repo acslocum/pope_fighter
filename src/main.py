@@ -372,8 +372,11 @@ def main_menu():
         title_x = SCREEN_WIDTH // 2 - scaled_font.size(title_text)[0] // 2
         title_y = SCREEN_HEIGHT * 0.05
 
-        draw_text(title_text, scaled_font, shadow_color, title_x + shadow_offset, title_y + shadow_offset)
-        draw_gradient_text(title_text, scaled_font, title_x, title_y, colors)
+        # draw_text(title_text, scaled_font, shadow_color, title_x + shadow_offset, title_y + shadow_offset)
+        # draw_gradient_text(title_text, scaled_font, title_x, title_y, colors)
+        title_img = render_outlined_text(title_text, scaled_font, YELLOW, BLACK, 2)
+        screen.blit(title_img, (title_x + shadow_offset, title_y + shadow_offset))
+        title_rect = pygame.rect.Rect((title_x + shadow_offset, title_y + shadow_offset), (title_img.get_width(), title_img.get_height()))
 
         button_width = 280
         button_height = 60
