@@ -1038,7 +1038,7 @@ def game_loop():
     loserID : int = None
     exit_button = None
     smoke_released = False
-    smoke_time_ms = 1000
+    smoke_time_ms = 2000
 
     while True:
         #draw_bg(bg_image, is_game_started=game_started)
