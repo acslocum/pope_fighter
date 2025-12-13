@@ -69,6 +69,4 @@ if __name__ == "__main__":
     port_name = find_ch340_device()
     if port_name is not None:
         fg = FogMachine(port_name)
-        fg.closeRelay(True)
-        time.sleep(1)
-        fg.closeRelay(False)
+        fg.produceSmoke(3000)
