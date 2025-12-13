@@ -2,6 +2,8 @@ import math
 import pygame
 from pygame import mixer
 from pygame import font
+#import cv2
+#import numpy as np
 import os
 import random
 import re
@@ -37,7 +39,7 @@ NEXT_BUTTON_Y = SCREEN_HEIGHT * 0.8 # set a consistent height for the 'Next' but
 FPS = 60
 ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
-game_debug = True
+game_debug = False
 # game_debug = True
 timed_ending_screens = False
 end_screen_wait = 5 * 1000
@@ -82,8 +84,8 @@ pope1_game_sounds = GameSounds('assets/audio/pope1')
 pope2_game_sounds = GameSounds('assets/audio/pope2')
 
 # declare pope IDs
-popeServerBaseURL = 'http://localhost:8080/' # local testing
-# popeServerBaseURL = 'https://yjjgz5xvun.us-east-2.awsapprunner.com/' # real deal
+#popeServerBaseURL = 'http://localhost:8080/' # local testing
+popeServerBaseURL = 'https://yjjgz5xvun.us-east-2.awsapprunner.com/' # real deal
 popeIDEndpoint = 'pope_json/'
 popeServerURL = popeServerBaseURL + popeIDEndpoint
 popeWinEndpoint = popeServerBaseURL + 'win/' # add 'popeid'
@@ -443,8 +445,11 @@ def main_menu():
         title_x = SCREEN_WIDTH // 2 - scaled_font.size(title_text)[0] // 2
         title_y = SCREEN_HEIGHT * 0.05
 
-        draw_text(title_text, scaled_font, shadow_color, title_x + shadow_offset, title_y + shadow_offset)
-        draw_gradient_text(title_text, scaled_font, title_x, title_y, colors)
+        # draw_text(title_text, scaled_font, shadow_color, title_x + shadow_offset, title_y + shadow_offset)
+        # draw_gradient_text(title_text, scaled_font, title_x, title_y, colors)
+        title_img = render_outlined_text(title_text, scaled_font, YELLOW, BLACK, 2)
+        screen.blit(title_img, (title_x + shadow_offset, title_y + shadow_offset))
+        title_rect = pygame.rect.Rect((title_x + shadow_offset, title_y + shadow_offset), (title_img.get_width(), title_img.get_height()))
 
         button_width = 280
         button_height = 60
@@ -1124,7 +1129,7 @@ def game_loop():
     loserID : int = None
     exit_button = None
     smoke_released = False
-    smoke_time_ms = 1000
+    smoke_time_ms = 2000
 
     while True:
         #draw_bg(bg_image, is_game_started=game_started)
@@ -1196,7 +1201,8 @@ def game_loop():
             if exit_button is not None:
                 if event.type == pygame.MOUSEBUTTONDOWN and exit_button.collidepoint(event.pos):
                     return winnerID, loserID
-                elif event.type == pygame.JOYBUTTONDOWN and event.button == START_BUTTON:
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    print(f"Joystick {event.joy}: Button {event.button} pressed")
                     return winnerID, loserID
 
         pygame.display.update()
