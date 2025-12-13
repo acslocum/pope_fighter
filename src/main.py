@@ -39,8 +39,9 @@ ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
 game_debug = True
 # game_debug = True
-timed_ending_screens = True
+timed_ending_screens = False
 end_screen_wait = 5 * 1000
+hof_table_length = 19
 
 # Colors
 RED = (255, 0, 0)
@@ -73,6 +74,7 @@ menu_font_title = pygame.font.Font(resource_path(font_name), 100)  # Larger font
 count_font = pygame.font.Font(resource_path(font_name), 80)
 score_font = pygame.font.Font(resource_path(font_name), 30)
 high_scores_font = pygame.font.Font(resource_path('assets/fonts/Academy Engraved LET Fonts.ttf'), 60)
+hall_of_fame_font = pygame.font.Font(resource_path('assets/fonts/Academy Engraved LET Fonts.ttf'), 30)
 frame_font = pygame.font.SysFont('Arial', 20, bold=True, italic=False)
 # Music and Sounds
 game_sounds = GameSounds('assets/audio')
@@ -279,6 +281,65 @@ def draw_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pyga
             table_surface.blit(cell_images[row][col], (x,y))
 
     return table_surface
+
+def draw_hof_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pygame.Surface:
+    #font_size = 60
+    #font = pygame.font.Font(font_name, font_size)  # Increased size for scores
+    font = hall_of_fame_font
+    h_pad = 30 # pixels between columns
+    v_pad = 10 # pixels between rows
+    row_height = 0
+    outline_width = 1
+
+    # render all the cells first
+    cell_images : list[list[pygame.Surface]] = []
+    col_widths = [0] * len(data[0])
+    row_count = min(hof_table_length, len(data))
+    #print(f'col_widths: {col_widths}')
+    for row in range(row_count):
+        #print(f'data_row: {row}')
+        cell_row : list[pygame.Surface] = []
+        for col in range(len(data[row])):
+            if wl_rows is not None and row in wl_rows:
+                if row == wl_rows[0]:
+                    text_surface = render_outlined_text(data[row][col], font, (44,234,26), (131,131,131), outline_width)
+                elif row == wl_rows[1]:
+                    text_surface = render_outlined_text(data[row][col], font, (255, 78, 36), (131,131,131), outline_width)
+            else:
+                text_surface = render_outlined_text(data[row][col], font, (237,220,26), (130,95,8), outline_width)
+            if text_surface.get_width() > col_widths[col]:
+                col_widths[col] = text_surface.get_width()
+            if text_surface.get_height() > row_height:
+                row_height = text_surface.get_height()
+            cell_row.append(text_surface)
+        cell_images.append(cell_row)
+    #print(f'col_widths: {col_widths}')
+
+    # calculate column offsets
+    col_offsets = [ ]
+    offset = 0
+    for width in col_widths:
+        col_offsets.append(offset)
+        offset += width + h_pad
+    #print(f'col_offsets: {col_offsets}')
+
+    # create surface big enough to hold everything
+    surface_width = (len(col_widths) - 1) * h_pad + sum(col_widths)
+    surface_height = (len(data) - 1) * h_pad + len(data) * row_height
+    table_surface = pygame.Surface( (surface_width, surface_height), pygame.SRCALPHA)
+
+    # render each image
+    center_cols = [0, 2] # we want these columns to be centered
+    for row in range(len(cell_images)):
+        for col in range(len(cell_images[row])):
+            x = col_offsets[col]
+            if col in center_cols:
+                x += (col_widths[col] - cell_images[row][col].get_width()) // 2
+            y = row_height * row + v_pad * row
+            table_surface.blit(cell_images[row][col], (x,y))
+
+    return table_surface
+
 
 def draw_error_msg(msg : str, timeout = 3000):
     if not isinstance(msg, str):
@@ -522,7 +583,8 @@ def hall_of_fame_screen():
     # if game_debug:
     #     while len(table_data) < 13:
     #         table_data.append([str(len(table_data)), 'St. Debug', '0 - 0'])
-    tbl_surf = draw_table(table_data, None)
+    tbl_surf_left = draw_hof_table(table_data[0:hof_table_length], None)
+    tbl_surf_right = draw_hof_table(table_data[hof_table_length:], None)
     
     time = pygame.time.get_ticks()
     while True:
@@ -531,9 +593,12 @@ def hall_of_fame_screen():
 
         scores_title = "HALL OF FAME"
         scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
-        screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
-        #draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
-        screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, 0.1 * SCREEN_HEIGHT ) )
+        #screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
+        draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
+        table_top_edge = 50 + menu_font_title.size(scores_title)[1] + 20
+        table_left_edge = 20 #(10 + tbl_surf.get_width()) // 2
+        screen.blit(tbl_surf_left, (table_left_edge, table_top_edge ) )
+        screen.blit(tbl_surf_right, (table_left_edge + SCREEN_WIDTH // 2, table_top_edge ) )
 
         button_width = 280
         button_height = 60
@@ -559,7 +624,7 @@ def hall_of_fame_screen():
 
 def build_HOF_rows(data):
     # print(data)
-    table_data = [ ['Name', 'Upgrades'] ]# will be an array of arrays, first array is the header
+    table_data = []# will be an array of arrays, no header
     line_num = 1 # header row is line 0
     if data is not None:
         for pope in data:
@@ -631,7 +696,8 @@ def scores_screen(winner, loser):
         scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
         screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
         #draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
-        screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, 0.1 * SCREEN_HEIGHT ) )
+        table_start_position = 50 + menu_font_title.size(scores_title)[1] + 20
+        screen.blit(tbl_surf, ((SCREEN_WIDTH - tbl_surf.get_width()) // 2, table_start_position ) )
 
         button_width = 280
         button_height = 60
