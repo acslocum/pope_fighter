@@ -194,7 +194,10 @@ def aspect_scale(img, tgtSize):
         else:
             sy = by
 
-    return pygame.transform.smoothscale(img, (sx,sy))
+    if img.get_bitsize() == 8:
+        return pygame.transform.scale(img, (sx, sy))
+    else:
+        return pygame.transform.smoothscale(img, (sx,sy))
 
 def victory_screen(winner_img):
     switch_music(None) # stop music for now, might replace with a victory screen
