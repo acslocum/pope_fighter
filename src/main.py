@@ -1206,6 +1206,8 @@ def game_loop():
                     return winnerID, loserID
                 elif event.type == pygame.JOYBUTTONDOWN:
                     print(f"Joystick {event.joy}: Button {event.button} pressed")
+                    return winnerID, loserID
+
         if timed_ending_screens and (game_end_time is not None) and (pygame.time.get_ticks() - game_end_time > end_screen_wait):
             return winnerID, loserID
         
