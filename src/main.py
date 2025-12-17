@@ -2,6 +2,8 @@ import math
 import pygame
 from pygame import mixer
 from pygame import font
+#import cv2
+#import numpy as np
 import os
 import random
 import re
@@ -37,10 +39,10 @@ NEXT_BUTTON_Y = SCREEN_HEIGHT * 0.8 # set a consistent height for the 'Next' but
 FPS = 60
 ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
-game_debug = True
+game_debug = False
 # game_debug = True
-timed_ending_screens = False
-end_screen_wait = 5 * 1000
+timed_ending_screens = True
+end_screen_wait = 10 * 1000
 hof_table_length = 19
 
 # Colors
@@ -82,8 +84,8 @@ pope1_game_sounds = GameSounds('assets/audio/pope1')
 pope2_game_sounds = GameSounds('assets/audio/pope2')
 
 # declare pope IDs
-popeServerBaseURL = 'http://localhost:8080/' # local testing
-# popeServerBaseURL = 'https://yjjgz5xvun.us-east-2.awsapprunner.com/' # real deal
+#popeServerBaseURL = 'http://localhost:8080/' # local testing
+popeServerBaseURL = 'https://yjjgz5xvun.us-east-2.awsapprunner.com/' # real deal
 popeIDEndpoint = 'pope_json/'
 popeServerURL = popeServerBaseURL + popeIDEndpoint
 popeWinEndpoint = popeServerBaseURL + 'win/' # add 'popeid'
@@ -231,7 +233,7 @@ def draw_gradient_text(text, font, x, y, colors):
 def draw_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pygame.Surface:
     #font_size = 60
     #font = pygame.font.Font(font_name, font_size)  # Increased size for scores
-    font = high_scores_font
+    font = hall_of_fame_font
     h_pad = 40 # pixels between columns
     v_pad = 20 # pixels between rows
     row_height = 0
@@ -446,8 +448,11 @@ def main_menu():
         title_x = SCREEN_WIDTH // 2 - scaled_font.size(title_text)[0] // 2
         title_y = SCREEN_HEIGHT * 0.05
 
-        draw_text(title_text, scaled_font, shadow_color, title_x + shadow_offset, title_y + shadow_offset)
-        draw_gradient_text(title_text, scaled_font, title_x, title_y, colors)
+        # draw_text(title_text, scaled_font, shadow_color, title_x + shadow_offset, title_y + shadow_offset)
+        # draw_gradient_text(title_text, scaled_font, title_x, title_y, colors)
+        title_img = render_outlined_text(title_text, scaled_font, YELLOW, BLACK, 2)
+        screen.blit(title_img, (title_x + shadow_offset, title_y + shadow_offset))
+        title_rect = pygame.rect.Rect((title_x + shadow_offset, title_y + shadow_offset), (title_img.get_width(), title_img.get_height()))
 
         button_width = 280
         button_height = 60
@@ -455,9 +460,9 @@ def main_menu():
         start_button = None
 
         if left_pope is not None and right_pope is None:
-            clear_button_x = SCREEN_WIDTH * 0.1 + (frame_img.get_width() - button_width) // 2
-            clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
-            clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
+            # clear_button_x = SCREEN_WIDTH * 0.1 + (frame_img.get_width() - button_width) // 2
+            # clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
+            # clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
 
             # need to scan second pope
             pygame.draw.rect(screen, WHITE, (f2_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
@@ -467,9 +472,9 @@ def main_menu():
             screen.blit(txt_img, (txt_x, txt_y))
 
         elif right_pope is not None:
-            clear_button_x = SCREEN_WIDTH * 0.9 - frame_img.get_width() + (frame_img.get_width() - button_width) // 2
-            clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
-            clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
+            # clear_button_x = SCREEN_WIDTH * 0.9 - frame_img.get_width() + (frame_img.get_width() - button_width) // 2
+            # clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
+            # clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
             start_button = draw_button("START", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
                                        NEXT_BUTTON_Y, button_width, button_height)
         else:
@@ -506,7 +511,7 @@ def main_menu():
                 pygame.quit()
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if start_button.collidepoint(event.pos):
+                if start_button is not None and start_button.collidepoint(event.pos):
                     previousMatch = [left_pope.id, right_pope.id]
                     return "START"
             elif start_button is not None and event.type == pygame.JOYBUTTONDOWN:
@@ -609,13 +614,14 @@ def hall_of_fame_screen():
 
         scores_title = "HALL OF FAME"
         scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
-        #screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
-        draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
-        table_top_edge = 50 + menu_font_title.size(scores_title)[1] + 20
-        left_edge = [20,20+table_surfaces[0].get_width(),40+table_surfaces[0].get_width()*2]
-        columns = min(3,len(table_surfaces))
-        for i in range(columns):
-            screen.blit(table_surfaces[i], (left_edge[i], table_top_edge ) )
+        screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
+        #draw_text(scores_title, menu_font_title, (237,220,26), SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
+        if len(table_surfaces) > 0:
+            table_top_edge = 50 + menu_font_title.size(scores_title)[1] + 20
+            left_edge = [20,20+table_surfaces[0].get_width(),40+table_surfaces[0].get_width()*2]
+            columns = min(3,len(table_surfaces))
+            for i in range(columns):
+                screen.blit(table_surfaces[i], (left_edge[i], table_top_edge ) )
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -935,30 +941,38 @@ def record_result(winner, loser):
             screen.blit(frame_img, (f2_x, f1_y))
 
         if winningPope is not None and winningPope.image is not None:
+            if winningPope.id == left_pope.id:
+                x_start = f1_x
+            else:
+                x_start = f2_x
             scaled_img = aspect_scale(winningPope.image, img_size)
-            sx = f1_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+            sx = x_start + (frame_img.get_width() - scaled_img.get_width()) / 2
             sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
             screen.blit(scaled_img, (sx,sy))
-            winner_rect = winner_txt.get_rect(center=(f1_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
+            winner_rect = winner_txt.get_rect(center=(x_start + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
             screen.blit(winner_txt, winner_rect)
             if winningPope.name is not None:
                 lpn_img = gen_text_img(winningPope.name, frame_font, BLACK)
-                lpn_x = f1_x + (frame_img.get_width() - lpn_img.get_width()) // 2
+                lpn_x = x_start + (frame_img.get_width() - lpn_img.get_width()) // 2
                 lpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - lpn_img.get_height()) // 2
                 screen.blit(lpn_img, (lpn_x, lpn_y))
         if losingPope is not None and losingPope.image is not None:
+            if losingPope.id == left_pope.id:
+                x_start = f1_x
+            else:
+                x_start = f2_x
             scaled_img = aspect_scale(losingPope.image, img_size)
-            sx = f2_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+            sx = x_start + (frame_img.get_width() - scaled_img.get_width()) / 2
             sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
             screen.blit(scaled_img, (sx,sy))
             dim_overlay = pygame.Surface(scaled_img.get_size(), pygame.SRCALPHA)
             dim_overlay.fill((0, 0, 0, 128)) 
             screen.blit(dim_overlay, (sx,sy))
-            loser_rect = winner_txt.get_rect(center=(f2_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
+            loser_rect = winner_txt.get_rect(center=(x_start + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
             screen.blit(loser_txt, loser_rect)
             if losingPope.name is not None:
                 rpn_img = gen_text_img(losingPope.name, frame_font, BLACK)
-                rpn_x = f2_x + (frame_img.get_width() - rpn_img.get_width()) // 2
+                rpn_x = x_start + (frame_img.get_width() - rpn_img.get_width()) // 2
                 rpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - rpn_img.get_height()) // 2
                 screen.blit(rpn_img, (rpn_x, rpn_y))
             
@@ -1113,6 +1127,7 @@ def game_loop():
     round_over = False
     winner_img = None
     game_started = True
+    game_end_time = None
     if game_debug:
         print('In game_loop():')
         print(f'  left joystick present  : {str(left_joystick is not None)} {str(left_joystick)}')
@@ -1127,7 +1142,7 @@ def game_loop():
     loserID : int = None
     exit_button = None
     smoke_released = False
-    smoke_time_ms = 1000
+    smoke_time_ms = 2000
 
     while True:
         #draw_bg(bg_image, is_game_started=game_started)
@@ -1154,6 +1169,8 @@ def game_loop():
             fighter_2.update()
 
             if not fighter_1.alive or not fighter_2.alive:
+                if game_end_time is None:
+                    game_end_time = pygame.time.get_ticks()
                 if fog_machine is not None and not smoke_released:
                     t = threading.Thread(target=fog_machine.produceSmoke, args=(smoke_time_ms,))
                     t.start()
@@ -1199,9 +1216,13 @@ def game_loop():
             if exit_button is not None:
                 if event.type == pygame.MOUSEBUTTONDOWN and exit_button.collidepoint(event.pos):
                     return winnerID, loserID
-                elif event.type == pygame.JOYBUTTONDOWN and event.button == START_BUTTON:
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    print(f"Joystick {event.joy}: Button {event.button} pressed")
                     return winnerID, loserID
 
+        if timed_ending_screens and (game_end_time is not None) and (pygame.time.get_ticks() - game_end_time > end_screen_wait):
+            return winnerID, loserID
+        
         pygame.display.update()
         clock.tick(FPS)
 
