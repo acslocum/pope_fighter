@@ -41,8 +41,8 @@ ROUND_OVER_COOLDOWN = 3000
 # variables for game debugging purposes
 game_debug = False
 # game_debug = True
-timed_ending_screens = False
-end_screen_wait = 5 * 1000
+timed_ending_screens = True
+end_screen_wait = 10 * 1000
 hof_table_length = 19
 
 # Colors
@@ -1115,6 +1115,7 @@ def game_loop():
     round_over = False
     winner_img = None
     game_started = True
+    game_end_time = None
     if game_debug:
         print('In game_loop():')
         print(f'  left joystick present  : {str(left_joystick is not None)} {str(left_joystick)}')
@@ -1156,6 +1157,8 @@ def game_loop():
             fighter_2.update()
 
             if not fighter_1.alive or not fighter_2.alive:
+                if game_end_time is None:
+                    game_end_time = pygame.time.get_ticks()
                 if fog_machine is not None and not smoke_released:
                     t = threading.Thread(target=fog_machine.produceSmoke, args=(smoke_time_ms,))
                     t.start()
@@ -1203,8 +1206,9 @@ def game_loop():
                     return winnerID, loserID
                 elif event.type == pygame.JOYBUTTONDOWN:
                     print(f"Joystick {event.joy}: Button {event.button} pressed")
-                    return winnerID, loserID
-
+        if timed_ending_screens and (game_end_time is not None) and (pygame.time.get_ticks() - game_end_time > end_screen_wait):
+            return winnerID, loserID
+        
         pygame.display.update()
         clock.tick(FPS)
 
