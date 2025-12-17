@@ -230,7 +230,7 @@ def draw_gradient_text(text, font, x, y, colors):
 def draw_table(data : list[list[str]], wl_rows : tuple[int, int] = None) -> pygame.Surface:
     #font_size = 60
     #font = pygame.font.Font(font_name, font_size)  # Increased size for scores
-    font = high_scores_font
+    font = hall_of_fame_font
     h_pad = 40 # pixels between columns
     v_pad = 20 # pixels between rows
     row_height = 0
