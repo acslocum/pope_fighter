@@ -938,30 +938,38 @@ def record_result(winner, loser):
             screen.blit(frame_img, (f2_x, f1_y))
 
         if winningPope is not None and winningPope.image is not None:
+            if winningPope.id == left_pope.id:
+                x_start = f1_x
+            else:
+                x_start = f2_x
             scaled_img = aspect_scale(winningPope.image, img_size)
-            sx = f1_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+            sx = x_start + (frame_img.get_width() - scaled_img.get_width()) / 2
             sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
             screen.blit(scaled_img, (sx,sy))
-            winner_rect = winner_txt.get_rect(center=(f1_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
+            winner_rect = winner_txt.get_rect(center=(x_start + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
             screen.blit(winner_txt, winner_rect)
             if winningPope.name is not None:
                 lpn_img = gen_text_img(winningPope.name, frame_font, BLACK)
-                lpn_x = f1_x + (frame_img.get_width() - lpn_img.get_width()) // 2
+                lpn_x = x_start + (frame_img.get_width() - lpn_img.get_width()) // 2
                 lpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - lpn_img.get_height()) // 2
                 screen.blit(lpn_img, (lpn_x, lpn_y))
         if losingPope is not None and losingPope.image is not None:
+            if losingPope.id == left_pope.id:
+                x_start = f1_x
+            else:
+                x_start = f2_x
             scaled_img = aspect_scale(losingPope.image, img_size)
-            sx = f2_x + (frame_img.get_width() - scaled_img.get_width()) / 2
+            sx = x_start + (frame_img.get_width() - scaled_img.get_width()) / 2
             sy = f1_y + (frame_img.get_height() - scaled_img.get_height()) / 2
             screen.blit(scaled_img, (sx,sy))
             dim_overlay = pygame.Surface(scaled_img.get_size(), pygame.SRCALPHA)
             dim_overlay.fill((0, 0, 0, 128)) 
             screen.blit(dim_overlay, (sx,sy))
-            loser_rect = winner_txt.get_rect(center=(f2_x + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
+            loser_rect = winner_txt.get_rect(center=(x_start + frame_img.get_width() // 2, f1_y + frame_img.get_height() // 2))
             screen.blit(loser_txt, loser_rect)
             if losingPope.name is not None:
                 rpn_img = gen_text_img(losingPope.name, frame_font, BLACK)
-                rpn_x = f2_x + (frame_img.get_width() - rpn_img.get_width()) // 2
+                rpn_x = x_start + (frame_img.get_width() - rpn_img.get_width()) // 2
                 rpn_y = f1_y + frame_img.get_height() - frame_offset + (frame_offset - rpn_img.get_height()) // 2
                 screen.blit(rpn_img, (rpn_x, rpn_y))
             
