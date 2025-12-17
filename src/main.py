@@ -508,7 +508,7 @@ def main_menu():
                 pygame.quit()
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if start_button.collidepoint(event.pos):
+                if start_button is not None and start_button.collidepoint(event.pos):
                     previousMatch = [left_pope.id, right_pope.id]
                     return "START"
             elif start_button is not None and event.type == pygame.JOYBUTTONDOWN:
