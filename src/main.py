@@ -457,9 +457,9 @@ def main_menu():
         start_button = None
 
         if left_pope is not None and right_pope is None:
-            clear_button_x = SCREEN_WIDTH * 0.1 + (frame_img.get_width() - button_width) // 2
-            clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
-            clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
+            # clear_button_x = SCREEN_WIDTH * 0.1 + (frame_img.get_width() - button_width) // 2
+            # clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
+            # clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
 
             # need to scan second pope
             pygame.draw.rect(screen, WHITE, (f2_x + frame_offset, f1_y + frame_offset, img_size[0], img_size[1]), 0)
@@ -469,9 +469,9 @@ def main_menu():
             screen.blit(txt_img, (txt_x, txt_y))
 
         elif right_pope is not None:
-            clear_button_x = SCREEN_WIDTH * 0.9 - frame_img.get_width() + (frame_img.get_width() - button_width) // 2
-            clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
-            clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
+            # clear_button_x = SCREEN_WIDTH * 0.9 - frame_img.get_width() + (frame_img.get_width() - button_width) // 2
+            # clear_button_y = SCREEN_HEIGHT * 0.2 + frame_img.get_height() + button_spacing + button_height // 2
+            # clear_button = draw_button("Clear", menu_font, BLACK, YELLOW, clear_button_x, clear_button_y, button_width, button_height)
             start_button = draw_button("START", menu_font, BLACK, GREEN, SCREEN_WIDTH // 2 - button_width // 2,
                                        NEXT_BUTTON_Y, button_width, button_height)
         else:
