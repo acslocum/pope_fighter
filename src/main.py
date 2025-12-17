@@ -611,13 +611,14 @@ def hall_of_fame_screen():
 
         scores_title = "HALL OF FAME"
         scores_surf = render_outlined_text(scores_title, menu_font_title, (237,220,26), (130,95,8))
-        #screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
-        draw_text(scores_title, menu_font_title, RED, SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
-        table_top_edge = 50 + menu_font_title.size(scores_title)[1] + 20
-        left_edge = [20,20+table_surfaces[0].get_width(),40+table_surfaces[0].get_width()*2]
-        columns = min(3,len(table_surfaces))
-        for i in range(columns):
-            screen.blit(table_surfaces[i], (left_edge[i], table_top_edge ) )
+        screen.blit(scores_surf, ( SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50 ) )
+        #draw_text(scores_title, menu_font_title, (237,220,26), SCREEN_WIDTH // 2 - menu_font_title.size(scores_title)[0] // 2, 50)
+        if len(table_surfaces) > 0:
+            table_top_edge = 50 + menu_font_title.size(scores_title)[1] + 20
+            left_edge = [20,20+table_surfaces[0].get_width(),40+table_surfaces[0].get_width()*2]
+            columns = min(3,len(table_surfaces))
+            for i in range(columns):
+                screen.blit(table_surfaces[i], (left_edge[i], table_top_edge ) )
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
